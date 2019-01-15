@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "dev": "NODE_ENV=development nodemon app.js",
+    "prod": "NODE_ENV=production node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "nj.wangwenhan@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^8.4.0",
     "koa": "^2.6.2",
     "koa-body": "^4.0.6",
@@ -17,6 +19,8 @@
     "koa-jwt": "^3.5.1",
     "koa-router": "^7.4.0",
     "koa2-cors": "^2.0.6",
+    "moment": "^2.23.0",
+    "mysql2": "^1.6.4",
     "sequelize": "^4.42.0"
   },
   "devDependencies": {

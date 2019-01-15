@@ -5,7 +5,7 @@ const json = require('koa-json');
 
 const index = require('./routes/index')
 const secret = require('./config/secret.json');
-const website = require('./config/website')
+const envConfig = require('./config')
 const needTokenApi = require('./config/needTokenApi.json')
 const { responseFormatter } = require('./utils/tolls')
 
@@ -17,7 +17,7 @@ app.use(async (ctx, next) => {
         if (err.status === 401) {
             ctx.status = 401;
             responseFormatter({
-                ctx, code: '1006'
+                ctx, code: '1007'
             })
         } else {
             throw err;
@@ -53,6 +53,6 @@ app.on('error', (err, ctx) => {
     console.error('server error', err, ctx)
 })
 
-app.listen(website.port, () => {
-    console.log(`${website.join()} 服务器已经启动！`);
+app.listen(envConfig.port, () => {
+    console.log('服务器已经启动！');
 });
