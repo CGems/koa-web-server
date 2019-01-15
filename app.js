@@ -7,6 +7,7 @@ const index = require('./routes/index')
 const secret = require('./config/secret.json');
 const website = require('./config/website')
 const needTokenApi = require('./config/needTokenApi.json')
+const { responseFormatter } = require('./utils/tolls')
 
 const app = new Koa();
 app.use(cors());
@@ -15,7 +16,9 @@ app.use(async (ctx, next) => {
     return next().catch(err => {
         if (err.status === 401) {
             ctx.status = 401;
-            ctx.body = 'token fail';
+            responseFormatter({
+                ctx, code: '1006'
+            })
         } else {
             throw err;
         }
