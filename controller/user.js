@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const { responseFormatter } = require('./../utils/tolls');
@@ -10,13 +9,13 @@ module.exports = class {
         if (bodyData.username && bodyData.password && bodyData.password_confirm) {
             if (bodyData.password !== bodyData.password_confirm) {
                 responseFormatter({
-                    ctx, code: '1003'
+                    ctx, code: '1007'
                 })
             } else {
                 const existUser = await userModule.findUserByName(bodyData.username)
                 if (existUser) {
                     responseFormatter({
-                        ctx, code: '1002'
+                        ctx, code: '1006'
                     })
                 } else {
                     const salt = bcrypt.genSaltSync();
@@ -32,18 +31,29 @@ module.exports = class {
         } else {
             responseFormatter({
                 ctx,
-                code: '1001'
+                code: '1003'
             });
         }
     }
-    static async login(ctx) { }
-    static async getUserInfo(ctx) {
+    static async login(ctx) {
+        ctx.session.id = 123
+        ctx.session.name = 'wwh'
         responseFormatter({
             ctx,
             code: '1000',
             data: {
                 username: '哈哈哈',
                 age: 30
+            }
+        })
+    }
+    static async getUserInfo(ctx) {
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data: {
+                id: ctx.session.id,
+                name: ctx.session.name
             }
         })
     }
