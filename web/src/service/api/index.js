@@ -1,6 +1,6 @@
 import global from './global'
-import login from './login'
+import user from './user'
 export default {
-    login,
+    user,
     global
 }

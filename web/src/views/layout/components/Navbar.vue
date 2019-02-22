@@ -16,7 +16,7 @@
           <size-select class="right-menu-item hover-effect"/>
         </el-tooltip>
 
-        <lang-select class="right-menu-item hover-effect"/>
+        <!-- <lang-select class="right-menu-item hover-effect"/> -->
 
         <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
           <theme-picker class="right-menu-item hover-effect"/>
@@ -55,7 +55,7 @@ import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
-import LangSelect from '@/components/LangSelect'
+// import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
 import Search from '@/components/HeaderSearch'
 
@@ -66,7 +66,7 @@ export default {
     ErrorLog,
     Screenfull,
     SizeSelect,
-    LangSelect,
+    // LangSelect,
     ThemePicker,
     Search
   },

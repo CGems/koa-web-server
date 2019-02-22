@@ -10,12 +10,12 @@ import {
   export function requestSuccessFunc(config) {
     CONSOLE_REQUEST_ENABLE && console.info('requestInterceptorFunc', `url: ${config.url}`, config)
     // 自定义请求拦截逻辑，可以处理权限，请求发送监控等
+    return config
   }
   
   export function requestFailFunc(requestError) {
     // 自定义发送请求失败逻辑，断网，请求发送监控等
     // ...
-  
     return Promise.reject(requestError);
   }
   
@@ -26,7 +26,7 @@ import {
       code
     } = resData.head
     switch (code) {
-      case 1000: // 如果业务成功，直接进成功回调
+      case '1000': // 如果业务成功，直接进成功回调
         return resData.body;
       default:
         // 业务中还会有一些特殊 code 逻辑，我们可以在这里做统一处理，也可以下方它们到业务层

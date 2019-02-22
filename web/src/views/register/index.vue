@@ -1,16 +1,16 @@
 <template>
-  <div class="login-container">
+  <div class="register-container">
     <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
+      ref="registerForm"
+      :model="registerForm"
+      :rules="registerRules"
+      class="register-form"
       auto-complete="on"
       label-position="left"
     >
       <div class="title-container">
         <h3 class="title">
-          系统登录
+          系统注册
         </h3>
         <!-- <lang-select class="set-language" /> -->
       </div>
@@ -20,7 +20,7 @@
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          v-model.trim="loginForm.username"
+          v-model.trim="registerForm.username"
           placeholder="用户名"
           name="username"
           type="text"
@@ -33,12 +33,11 @@
           <svg-icon icon-class="password" />
         </span>
         <el-input
-          v-model.trim="loginForm.password"
+          v-model.trim="registerForm.password"
           :type="passwordType"
           placeholder="密码"
           name="password"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon
@@ -46,14 +45,30 @@
           />
         </span>
       </el-form-item>
-
+      <el-form-item prop="passwordConfirm">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          v-model.trim="registerForm.passwordConfirm"
+          :type="passwordType"
+          placeholder="确认密码"
+          name="passwordConfirm"
+          auto-complete="on"
+        />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon
+            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+          />
+        </span>
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
         style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin"
+        @click.native.prevent="handleRegister"
       >
-        登录
+        注册
       </el-button>
     </el-form>
   </div>
@@ -63,43 +78,77 @@
 // import LangSelect from '@/components/LangSelect'
 
 export default {
-  name: "Login",
+  name: "Register",
   // components: { LangSelect },
   data() {
     const validatePassword = (rule, value, callback) => {
+      // const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+      // if (!reg.test(value)) {
+      //     callback(
+      //         new Error(
+      //             "密码至少6个字符，至少1个大写字母，1个小写字母和1个数字"
+      //         )
+      //     );
+      //     return;
+      // }
       if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
+        callback(new Error("请输入至少6位字符密码"));
+        return;
+      } else if (value.length > 24) {
+        callback(new Error("请输入小于24位字符密码"));
+        return;
+      }
+      if (this.registerForm.passwordConfirm !== "") {
+        this.$refs.registerForm.validateField("passwordConfirm");
+      }
+      callback();
+    };
+    const validatePasswordConfirm = (rule, value, callback) => {
+      if (value !== this.registerForm.password) {
+        callback(new Error("两次输入密码不一致"));
       } else {
+        // const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+        // if (!reg.test(value)) {
+        //     callback(
+        //         new Error(
+        //             "密码至少6个字符，至少1个大写字母，1个小写字母和1个数字"
+        //         )
+        //     );
+        //     return;
+        // }
+        if (value.length < 6) {
+          callback(new Error("请输入至少6位字符密码"));
+          return;
+        } else if (value.length > 24) {
+          callback(new Error("请输入小于24位字符密码"));
+          return;
+        }
         callback();
       }
     };
     return {
-      loginForm: {
+      registerForm: {
         username: "",
-        password: ""
+        password: "",
+        passwordConfirm: ""
       },
-      loginRules: {
+      registerRules: {
         username: [
           { required: true, trigger: "blur", message: "请输入用户名" }
         ],
         password: [
           { required: true, trigger: "blur", message: "请输入密码" },
           { trigger: "blur", validator: validatePassword }
+        ],
+        passwordConfirm: [
+          { required: true, trigger: "blur", message: "请输入密码" },
+          { trigger: "blur", validator: validatePasswordConfirm }
         ]
       },
       passwordType: "password",
       loading: false,
-      showDialog: false,
-      redirect: undefined
+      showDialog: false
     };
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true
-    }
   },
   methods: {
     showPwd() {
@@ -109,15 +158,18 @@ export default {
         this.passwordType = "password";
       }
     },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true;
-          this.$store
-            .dispatch("LoginByUsername", this.loginForm)
+          this.$api["userRegister"]({
+            username: this.registerForm.username,
+            password: this.registerForm.password,
+            passwordConfirm: this.registerForm.passwordConfirm
+          })
             .then(() => {
               this.loading = false;
-              this.$router.push({ path: this.redirect || "/" });
+              this.$router.push({ path: "/login" });
             })
             .catch(() => {
               this.loading = false;
@@ -140,7 +192,7 @@ $light_gray: #eee;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
+  .register-container .el-input input {
     color: $cursor;
     &::first-line {
       color: $light_gray;
@@ -149,7 +201,7 @@ $cursor: #fff;
 }
 
 /* reset element-ui css */
-.login-container {
+.register-container {
   .el-input {
     display: inline-block;
     height: 47px;
@@ -183,12 +235,12 @@ $bg: #2d3a4b;
 $dark_gray: #889aa4;
 $light_gray: #eee;
 
-.login-container {
+.register-container {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
-  .login-form {
+  .register-form {
     position: relative;
     width: 520px;
     max-width: 100%;

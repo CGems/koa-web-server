@@ -40,4 +40,4 @@ export const CONST_DEFAULT_CONFIG = {
 // 还有一些业务相关的配置
 // ...
 
-export const CONSOLE_REQUEST_ENABLE = false // 开启请求参数打印
+export const CONSOLE_REQUEST_ENABLE = true // 开启请求参数打印

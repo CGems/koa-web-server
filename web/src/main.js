@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import i18n from 'Lang'
 import App from './App.vue'
+
+// 引入样式reset
+import '~/normalize.css'
+
 import './registerServiceWorker'
 
 // 引入插件

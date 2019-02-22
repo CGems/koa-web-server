@@ -1,7 +1,6 @@
 const Koa = require('koa');
 const cors = require('koa2-cors');
 const json = require('koa-json');
-const session = require('koa-session');
 const index = require('./routes/index')
 const envConfig = require('./config')
 const needTokenApi = require('./config/needTokenApi.json')
@@ -13,30 +12,6 @@ app.use(cors());
 app.use(json());
 
 app.keys = ['cGXcA8DICAvqmXWdi1Nai3D3A3gLTeOdBJ8tPKLbfzl5t6Is4Z2D9qwLbOJuT6V']
-
-let store = {
-    storage: {},
-    get(key, maxAge) {
-        return {
-            id: null
-        }
-    },
-    set(key, sess, maxAge) {
-        this.storage[key] = sess
-    },
-    destroy(key) {
-        delete this.storage[key]
-    }
-}
-
-app.use(session({
-    key: 'koa:sess',
-    maxAge: 86400000, /** (number) maxAge in ms (default is 1 days)，cookie的过期时间，这里表示2个小时 */
-    overwrite: true, /** (boolean) can overwrite or not (default true) */
-    httpOnly: true, /** (boolean) httpOnly or not (default true) */
-    signed: true, /** (boolean) signed or not (default true) */
-    store
-}, app));
 
 app.use(async (ctx, next) => {
     return next().then(() => {

@@ -17,6 +17,11 @@ export const constantRouterMap = [
         path: '/login',
         component: () => import( /* webpackChunkName: "login" */ 'Views/login'),
         hidden: true
+    },
+    {
+        path: '/register',
+        component: () => import( /* webpackChunkName: "register" */ 'Views/register'),
+        hidden: true
     }
 ]
 

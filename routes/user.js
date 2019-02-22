@@ -10,7 +10,7 @@ const router = new Router();
  * */
 
 // 注册 
-router.post('/register', koaBody({multipart: true}), userController.creat)
+router.post('/register', koaBody(), userController.creat)
 // 登录
 router.post('/login', koaBody(), userController.login)
 // 用户信息

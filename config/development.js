@@ -5,8 +5,8 @@
 module.exports = {
     env: 'development',
     scheme: 'http',
-    host: 'localhost',
-    port: 3000,
+    host: '127.0.0.1',
+    port: 5918,
     database:'robot',
     databaseUsername: 'root',
     databasePassword: '12345678'

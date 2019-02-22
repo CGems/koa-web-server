@@ -6,8 +6,8 @@ const userModule = require('./../modules/user');
 module.exports = class {
     static async creat(ctx) {
         const bodyData = ctx.request.body
-        if (bodyData.username && bodyData.password && bodyData.password_confirm) {
-            if (bodyData.password !== bodyData.password_confirm) {
+        if (bodyData.username && bodyData.password && bodyData.passwordConfirm) {
+            if (bodyData.password !== bodyData.passwordConfirm) {
                 responseFormatter({
                     ctx, code: '1007'
                 })
@@ -36,14 +36,13 @@ module.exports = class {
         }
     }
     static async login(ctx) {
-        ctx.session.id = 123
-        ctx.session.name = 'wwh'
         responseFormatter({
             ctx,
             code: '1000',
             data: {
                 username: '哈哈哈',
-                age: 30
+                age: 30,
+                token: '421312312312sdsfdsf'
             }
         })
     }
