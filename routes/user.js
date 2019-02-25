@@ -10,10 +10,10 @@ const router = new Router();
  * */
 
 // 注册 
-router.post('/register', koaBody(), userController.creat)
+router.post('/', koaBody(), userController.create)
 // 登录
 router.post('/login', koaBody(), userController.login)
 // 用户信息
-router.get('/info', userController.getUserInfo)
+router.get('/', userController.getUserInfo)
 
 module.exports = router;

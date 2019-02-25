@@ -15,14 +15,14 @@
         <!-- <lang-select class="set-language" /> -->
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          v-model.trim="registerForm.username"
+          v-model.trim="registerForm.userName"
           placeholder="用户名"
-          name="username"
+          name="userName"
           type="text"
           auto-complete="on"
         />
@@ -128,12 +128,12 @@ export default {
     };
     return {
       registerForm: {
-        username: "",
+        userName: "",
         password: "",
         passwordConfirm: ""
       },
       registerRules: {
-        username: [
+        userName: [
           { required: true, trigger: "blur", message: "请输入用户名" }
         ],
         password: [
@@ -163,7 +163,7 @@ export default {
         if (valid) {
           this.loading = true;
           this.$api["userRegister"]({
-            username: this.registerForm.username,
+            userName: this.registerForm.userName,
             password: this.registerForm.password,
             passwordConfirm: this.registerForm.passwordConfirm
           })

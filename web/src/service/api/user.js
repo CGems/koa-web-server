@@ -12,8 +12,8 @@ export default [{
     name: 'register',
     method: 'POST',
     desc: '注册',
-    path: '/user/register',
-    mockPath: '/user/register',
+    path: '/user',
+    mockPath: '/user',
     params: {},
     options: {
         unSignature: true

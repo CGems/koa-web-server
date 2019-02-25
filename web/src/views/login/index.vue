@@ -15,14 +15,14 @@
         <!-- <lang-select class="set-language" /> -->
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          v-model.trim="loginForm.username"
+          v-model.trim="loginForm.userName"
           placeholder="用户名"
-          name="username"
+          name="userName"
           type="text"
           auto-complete="on"
         />
@@ -75,11 +75,11 @@ export default {
     };
     return {
       loginForm: {
-        username: "",
+        userName: "",
         password: ""
       },
       loginRules: {
-        username: [
+        userName: [
           { required: true, trigger: "blur", message: "请输入用户名" }
         ],
         password: [

@@ -49,7 +49,7 @@ const user = {
     // 用户名登录
     LoginByUsername({ commit }, userInfo) {
       return userAuthenticate({
-        username: userInfo.username,
+        userName: userInfo.userName,
         password: userInfo.password
       }).then(res => {
         commit('SET_TOKEN', res.token)
