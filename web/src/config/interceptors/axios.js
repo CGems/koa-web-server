@@ -22,12 +22,9 @@ import {
   export function responseSuccessFunc(responseObj) {
     // 自定义响应成功逻辑，全局拦截接口，根据不同业务做不同处理，响应成功监控等
     let resData = responseObj.data
-    let {
-      code
-    } = resData.head
-    switch (code) {
+    switch (resData.code) {
       case '1000': // 如果业务成功，直接进成功回调
-        return resData.body;
+        return resData.data;
       default:
         // 业务中还会有一些特殊 code 逻辑，我们可以在这里做统一处理，也可以下方它们到业务层
         !responseObj.config.noShowDefaultError && window.GLOBAL.vbus.$emit('global.$dialog.show', resData.msg);

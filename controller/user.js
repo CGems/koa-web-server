@@ -23,7 +23,7 @@ module.exports = class {
                     })
                 } else {
                     // 查找普通用户的角色实例
-                    const role = await userModule.findRoleIdByRoleName('user');
+                    const role = await userModule.findRoleByRoleName('user');
                     // 加密密码
                     const salt = bcrypt.genSaltSync();
                     const hash = bcrypt.hashSync(bodyData.password, salt);
@@ -44,42 +44,47 @@ module.exports = class {
     }
     static async login(ctx) {
         const bodyData = ctx.request.body
-        const user = await userModule.findUserByName(bodyData.userName);
-        // 判断用户是否存在
-        if (user) {
-            // 判断前端传递的用户密码是否与数据库密码一致
-            if (bcrypt.compareSync(bodyData.password, user.password)) {
-                const token = crypto.randomBytes(32).toString('hex');
-                await userModule.createLoginToken(token, moment().add(7, 'days').toDate(), user.id)
-                responseFormatter({
-                    ctx,
-                    code: '1000',
-                    data: {
-                        userName: user.userName,
-                        token
-                    }
-                })
+        if (bodyData.userName && bodyData.password) {
+            const user = await userModule.findUserByName(bodyData.userName);
+            // 判断用户是否存在
+            if (user) {
+                // 判断前端传递的用户密码是否与数据库密码一致
+                if (bcrypt.compareSync(bodyData.password, user.password)) {
+                    const token = crypto.randomBytes(32).toString('hex');
+                    const expireAt = moment().add(7, 'days')
+                    await userModule.createLoginToken(token, expireAt.toDate(), user.id)
+                    const role = await userModule.findRoleByRoleId(user.roleId)
+                    responseFormatter({
+                        ctx,
+                        code: '1000',
+                        data: {
+                            userName: user.userName,
+                            token: {
+                                value: token,
+                                expireAt: expireAt.format('YYYY-MM-DD HH:mm:ss')
+                            },
+                            roleName: role.roleName
+                        }
+                    })
+                } else {
+                    responseFormatter({
+                        ctx, code: '1010'
+                    })
+                }
+
             } else {
                 responseFormatter({
                     ctx, code: '1010'
                 })
             }
-
         } else {
+            // 入参不对
             responseFormatter({
-                ctx, code: '1010'
+                ctx, code: '1003'
             })
         }
-
     }
     static async getUserInfo(ctx) {
-        responseFormatter({
-            ctx,
-            code: '1000',
-            data: {
-                id: ctx.session.id,
-                name: ctx.session.name
-            }
-        })
+
     }
 };

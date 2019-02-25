@@ -18,11 +18,32 @@ module.exports = class {
             }
         })
     }
-    static async findRoleIdByRoleName(roleName) {
+    // 根据角色名查找角色信息
+    static async findRoleByRoleName(roleName) {
         return await Role.findOne({
             where: {
                 roleName
             }
+        })
+    }
+    // 根据角色表id查找角色信息
+    static async findRoleByRoleId(id) {
+        return await Role.findOne({
+            where: {
+                id
+            }
+        })
+    }
+    static async createLoginToken(token, expireAt, userId) {
+        await Token.destroy({
+            where: {
+                userId
+            }
+        })
+        return await Token.create({
+            token,
+            userId,
+            expireAt
         })
     }
     static async findUserIdByToken(token) {
@@ -32,11 +53,11 @@ module.exports = class {
             }
         })
     }
-    static async createLoginToken(token, expireAt, userId) {
-        return await Token.create({
-            token,
-            userId,
-            expireAt
+    static async findTokenByUserId(userId) {
+        return await Token.findOne({
+            where: {
+                userId
+            }
         })
     }
 }

@@ -52,8 +52,8 @@ const user = {
         userName: userInfo.userName,
         password: userInfo.password
       }).then(res => {
-        commit('SET_TOKEN', res.token)
-        setToken(res.token)
+        commit('SET_TOKEN', res.token.value)
+        setToken(res.token.value)
       })
     },
     // 获取用户信息

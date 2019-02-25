@@ -5,10 +5,10 @@ module.exports = function () {
             throw {
                 status: 401
             }
-        }else{
+        } else {
             next()
         }
-    }
+    };
     ware.unless = unless;
     return ware;
 }
