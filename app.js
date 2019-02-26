@@ -15,14 +15,15 @@ app.keys = ['cGXcA8DICAvqmXWdi1Nai3D3A3gLTeOdBJ8tPKLbfzl5t6Is4Z2D9qwLbOJuT6V']
 
 app.use(async (ctx, next) => {
     return next().then(() => {
-        if (ctx.status === 405) {
+        console.log('1')
+        if (ctx.status === 405) { // 方法不存在
             ctx.status = 200
             responseFormatter({
                 ctx, code: '1002'
             })
         }
     }).catch(err => {
-        if (err.status === 401) {
+        if (err.status === 401) { // 未通过认证（token过期或异常）
             ctx.status = 401;
             ctx.session = null;
             responseFormatter({

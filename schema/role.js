@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         roleName: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         desc: {
             type: DataTypes.STRING,

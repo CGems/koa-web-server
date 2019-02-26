@@ -6,7 +6,7 @@ export default [{
     mockPath: '/user/login',
     params: {},
     options: {
-        unSignature: true
+        notNeedAuth: true
     }
 }, {
     name: 'register',
@@ -16,6 +16,14 @@ export default [{
     mockPath: '/user',
     params: {},
     options: {
-        unSignature: true
+        notNeedAuth: true
     }
+}, {
+    name: 'getUserInfo',
+    method: 'GET',
+    desc: '获取用户信息',
+    path: '/user',
+    mockPath: '/user',
+    params: {},
+    options: {}
 }]

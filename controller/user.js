@@ -6,6 +6,7 @@ const { responseFormatter } = require('./../utils/tolls');
 const userModule = require('./../modules/user');
 
 module.exports = class {
+    // 用户注册
     static async create(ctx) {
         const bodyData = ctx.request.body
         if (bodyData.userName && bodyData.password && bodyData.passwordConfirm) {
@@ -14,6 +15,22 @@ module.exports = class {
                     ctx, code: '1007'
                 })
             } else {
+                const userNameLength = bodyData.userName.length
+                if (userNameLength < 6 || userNameLength > 20) {
+                    // 检查用户名长度
+                    responseFormatter({
+                        ctx, code: '1011'
+                    })
+                    return
+                }
+                const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,24}$/;
+                if (!reg.test(bodyData.password)) {
+                    // 检查密码强度
+                    responseFormatter({
+                        ctx, code: '1012'
+                    })
+                    return
+                }
                 // 查询用户名是否重复
                 const existUser = await userModule.findUserByName(bodyData.userName)
                 if (existUser) {
@@ -23,7 +40,7 @@ module.exports = class {
                     })
                 } else {
                     // 查找普通用户的角色实例
-                    const role = await userModule.findRoleByRoleName('user');
+                    const role = await userModule.findRoleByParam({ roleName: 'user' });
                     // 加密密码
                     const salt = bcrypt.genSaltSync();
                     const hash = bcrypt.hashSync(bodyData.password, salt);
@@ -42,6 +59,7 @@ module.exports = class {
             });
         }
     }
+    // 用户登录
     static async login(ctx) {
         const bodyData = ctx.request.body
         if (bodyData.userName && bodyData.password) {
@@ -53,7 +71,7 @@ module.exports = class {
                     const token = crypto.randomBytes(32).toString('hex');
                     const expireAt = moment().add(7, 'days')
                     await userModule.createLoginToken(token, expireAt.toDate(), user.id)
-                    const role = await userModule.findRoleByRoleId(user.roleId)
+                    const role = await userModule.findRoleByParam({ id: user.roleId })
                     responseFormatter({
                         ctx,
                         code: '1000',
@@ -84,7 +102,33 @@ module.exports = class {
             })
         }
     }
+    // 用户鉴权
+    static async authByToken(ctx) {
+        return new Promise(async (resolve) => {
+            if (ctx.request.header.authorization) {
+                const token = await userModule.findTokenByParam({ token: ctx.request.header.authorization })
+                if (token && moment().isBefore(token.expireAt)) {
+                    ctx.state.userId = token.userId
+                    resolve(true)
+                    return
+                }
+                resolve(false)
+                return
+            }
+            resolve(false)
+        })
+    }
+    // 获取用户信息
     static async getUserInfo(ctx) {
-
+        const user = await userModule.findUserByUserId(ctx.state.userId)
+        const role = await userModule.findRoleByParam({ id: user.roleId })
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data: {
+                userName: user.userName,
+                roleName: role.roleName
+            }
+        })
     }
 };

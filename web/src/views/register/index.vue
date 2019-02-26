@@ -82,20 +82,13 @@ export default {
   // components: { LangSelect },
   data() {
     const validatePassword = (rule, value, callback) => {
-      // const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
-      // if (!reg.test(value)) {
-      //     callback(
-      //         new Error(
-      //             "密码至少6个字符，至少1个大写字母，1个小写字母和1个数字"
-      //         )
-      //     );
-      //     return;
-      // }
-      if (value.length < 6) {
-        callback(new Error("请输入至少6位字符密码"));
-        return;
-      } else if (value.length > 24) {
-        callback(new Error("请输入小于24位字符密码"));
+      const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,24}$/;
+      if (!reg.test(value)) {
+        callback(
+          new Error(
+            "密码长度应在6至24个字符之间，至少1个大写字母，1个小写字母和1个数字"
+          )
+        );
         return;
       }
       if (this.registerForm.passwordConfirm !== "") {
@@ -107,20 +100,13 @@ export default {
       if (value !== this.registerForm.password) {
         callback(new Error("两次输入密码不一致"));
       } else {
-        // const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
-        // if (!reg.test(value)) {
-        //     callback(
-        //         new Error(
-        //             "密码至少6个字符，至少1个大写字母，1个小写字母和1个数字"
-        //         )
-        //     );
-        //     return;
-        // }
-        if (value.length < 6) {
-          callback(new Error("请输入至少6位字符密码"));
-          return;
-        } else if (value.length > 24) {
-          callback(new Error("请输入小于24位字符密码"));
+        const reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,24}$/;
+        if (!reg.test(value)) {
+          callback(
+            new Error(
+              "密码长度应在6至24个字符之间，至少1个大写字母，1个小写字母和1个数字"
+            )
+          );
           return;
         }
         callback();
@@ -134,7 +120,13 @@ export default {
       },
       registerRules: {
         userName: [
-          { required: true, trigger: "blur", message: "请输入用户名" }
+          { required: true, trigger: "blur", message: "请输入用户名" },
+          {
+            min: 6,
+            max: 20,
+            trigger: "blur",
+            message: "用户名长度应在6至20之间"
+          }
         ],
         password: [
           { required: true, trigger: "blur", message: "请输入密码" },
@@ -169,10 +161,18 @@ export default {
           })
             .then(() => {
               this.loading = false;
+              this.$message({
+                message: "注册成功",
+                type: "success"
+              });
               this.$router.push({ path: "/login" });
             })
-            .catch(() => {
+            .catch(err => {
               this.loading = false;
+              this.$message({
+                message: err.msg,
+                type: "error"
+              });
             });
         } else {
           return false;

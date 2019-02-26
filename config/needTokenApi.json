@@ -1,6 +1,6 @@
 {
     "GET": [
-        "^\/api\/v1\/user\/info"
+        "^\/api\/v1\/user"
     ],
     "POST": []
 }

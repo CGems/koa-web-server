@@ -1,12 +1,15 @@
 const unless = require('koa-unless');
+const userController = require('../controller/user')
+
 module.exports = function () {
     const ware = async function (ctx, next) {
-        if (ctx.session.id === null) {
+        const result = await userController.authByToken(ctx)
+        if (result) {
+            await next()
+        } else {
             throw {
                 status: 401
             }
-        } else {
-            next()
         }
     };
     ware.unless = unless;

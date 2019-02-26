@@ -66,13 +66,6 @@ export default {
   name: "Login",
   // components: { LangSelect },
   data() {
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
-      } else {
-        callback();
-      }
-    };
     return {
       loginForm: {
         userName: "",
@@ -82,10 +75,7 @@ export default {
         userName: [
           { required: true, trigger: "blur", message: "请输入用户名" }
         ],
-        password: [
-          { required: true, trigger: "blur", message: "请输入密码" },
-          { trigger: "blur", validator: validatePassword }
-        ]
+        password: [{ required: true, trigger: "blur", message: "请输入密码" }]
       },
       passwordType: "password",
       loading: false,
@@ -117,10 +107,18 @@ export default {
             .dispatch("LoginByUsername", this.loginForm)
             .then(() => {
               this.loading = false;
+              this.$message({
+                message: "登录成功",
+                type: "success"
+              });
               this.$router.push({ path: this.redirect || "/" });
             })
-            .catch(() => {
+            .catch(err => {
               this.loading = false;
+              this.$message({
+                message: err.msg,
+                type: "error"
+              });
             });
         } else {
           return false;

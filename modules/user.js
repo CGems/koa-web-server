@@ -18,45 +18,43 @@ module.exports = class {
             }
         })
     }
-    // 根据角色名查找角色信息
-    static async findRoleByRoleName(roleName) {
-        return await Role.findOne({
-            where: {
-                roleName
-            }
-        })
-    }
-    // 根据角色表id查找角色信息
-    static async findRoleByRoleId(id) {
-        return await Role.findOne({
+    // 根据用户ID查找用户
+    static async findUserByUserId(id) {
+        return await User.findOne({
             where: {
                 id
             }
         })
     }
-    static async createLoginToken(token, expireAt, userId) {
-        await Token.destroy({
+    // 根据参数查找角色信息
+    static async findRoleByParam(param) {
+        return await Role.findOne({
             where: {
-                userId
+                ...param
             }
         })
+    }
+    // 创建登录令牌
+    static async createLoginToken(token, expireAt, userId) {
+        await this.deleteLoginToken(userId)
         return await Token.create({
             token,
             userId,
             expireAt
         })
     }
-    static async findUserIdByToken(token) {
-        return await Token.findOne({
+    static async deleteLoginToken(userId) {
+        return await Token.destroy({
             where: {
-                token
+                userId
             }
         })
     }
-    static async findTokenByUserId(userId) {
+    // 根据参数查找令牌信息
+    static async findTokenByParam(param) {
         return await Token.findOne({
             where: {
-                userId
+                ...param
             }
         })
     }
