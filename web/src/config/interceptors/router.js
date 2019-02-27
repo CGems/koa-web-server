@@ -2,6 +2,7 @@ import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 import store from 'Plugins/store';
 import { getToken } from 'Utils/auth';
+import router from 'Plugins/router'
 
 NProgress.configure({
   showSpinner: false
@@ -14,16 +15,19 @@ export function routerBeforeEachFunc(to, from, next) {
     // 已有token
     if (to.path === '/login') {
       next({ path: '/' })
-      // NProgress.done()
+      NProgress.done()
     } else {
       if (store.getters.userLoginStatus === 'notyet') { // 判断当前用户是否已拉取完user_info信息
-        store.dispatch('GetUserInfo').then(res => { // 拉取user_info
-          console.log(res)
+        store.dispatch('GetUserInfo').then(() => { // 拉取user_info
+          store.dispatch('GenerateRoutes').then(() => {
+            router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+          })
         })
       }
     }
   } else {
-    const whiteList = ['/login', '/register', '/auth-redirect']// no redirect whitelist
+    const whiteList = ['/login', '/register', '/auth-redirect', '/401', '/404']// no redirect whitelist
     if (whiteList.indexOf(to.path) > -1) {
       // 免登录白名单
       next()

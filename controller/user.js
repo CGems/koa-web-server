@@ -32,7 +32,7 @@ module.exports = class {
                     return
                 }
                 // 查询用户名是否重复
-                const existUser = await userModule.findUserByName(bodyData.userName)
+                const existUser = await userModule.findUserByParam({ userName: bodyData.userName })
                 if (existUser) {
                     // 反馈存在用户名
                     responseFormatter({
@@ -63,7 +63,7 @@ module.exports = class {
     static async login(ctx) {
         const bodyData = ctx.request.body
         if (bodyData.userName && bodyData.password) {
-            const user = await userModule.findUserByName(bodyData.userName);
+            const user = await userModule.findUserByParam({ userName: bodyData.userName });
             // 判断用户是否存在
             if (user) {
                 // 判断前端传递的用户密码是否与数据库密码一致
@@ -104,23 +104,17 @@ module.exports = class {
     }
     // 用户鉴权
     static async authByToken(ctx) {
-        return new Promise(async (resolve) => {
-            if (ctx.request.header.authorization) {
-                const token = await userModule.findTokenByParam({ token: ctx.request.header.authorization })
-                if (token && moment().isBefore(token.expireAt)) {
-                    ctx.state.userId = token.userId
-                    resolve(true)
-                    return
-                }
-                resolve(false)
-                return
+        if (ctx.request.header.authorization) {
+            const token = await userModule.findTokenByParam({ token: ctx.request.header.authorization })
+            if (token && moment().isBefore(token.expireAt)) {
+                ctx.state.userId = token.userId
+                return true
             }
-            resolve(false)
-        })
+        }
     }
     // 获取用户信息
     static async getUserInfo(ctx) {
-        const user = await userModule.findUserByUserId(ctx.state.userId)
+        const user = await userModule.findUserByParam({ id: ctx.state.userId })
         const role = await userModule.findRoleByParam({ id: user.roleId })
         responseFormatter({
             ctx,
@@ -130,5 +124,15 @@ module.exports = class {
                 roleName: role.roleName
             }
         })
+    }
+    // 获取用户信息
+    static async checkRoleForRoute(ctx, roles) {
+        const user = await userModule.findUserByParam({ id: ctx.state.userId })
+        const role = await userModule.findRoleByParam({ id: user.roleId })
+        if (roles.includes(role.roleName)) {
+            ctx.state.user = user
+            ctx.state.role = role
+            return true
+        }
     }
 };

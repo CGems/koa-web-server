@@ -3,7 +3,7 @@ const cors = require('koa2-cors');
 const json = require('koa-json');
 const index = require('./routes/index')
 const envConfig = require('./config')
-const needTokenApi = require('./config/needTokenApi.json')
+const needAuthApi = require('./config/needAuthApi.json')
 const { responseFormatter } = require('./utils/tolls')
 const authenticateMiddleware = require('./middlewares/authenticate.js')
 
@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(authenticateMiddleware().unless((ctx) => {
-    for (let reg of needTokenApi[ctx.method]) {
+    for (let reg of needAuthApi[ctx.method]) {
         reg = new RegExp(reg);
         if (reg.test(ctx.path)) {
             return false

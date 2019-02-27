@@ -1,8 +1,9 @@
 import {
   CONSOLE_REQUEST_ENABLE
 } from '../index.js'
-// import store from 'Plugins/store';
+import store from 'Plugins/store';
 import axios from 'Plugins/axios';
+import router from 'Plugins/router';
 import {
   Message
 } from 'element-ui';
@@ -40,16 +41,16 @@ export function responseSuccessFunc(responseObj) {
 export function responseFailFunc(responseError) {
   // 响应失败
   if (responseError.response) {
-    // switch (responseError.response.status) {
-    //   case 403:
-    //     _needJumpLogin(responseError.config)
-    //     return Promise.reject({head:{
-    //       code: 9527,
-    //       msg: 'token invalid'
-    //     }});
-    //   default:
-    return Promise.reject(responseError.response.data);
-    // }
+    switch (responseError.response.status) {
+      case 401:
+        _needJumpLogin(responseError.config)
+        return Promise.reject({
+          code: 401,
+          msg: 'token invalid'
+        });
+      default:
+        return Promise.reject(responseError.response.data);
+    }
   } else {
     if (responseError.code === "ECONNABORTED") {
       // 请求超时了
@@ -96,20 +97,16 @@ export function responseFailFunc(responseError) {
   }
 }
 
-// function _needJumpLogin(config) {
-//   if (config.name === "getUserInfo") {
-//     store.dispatch("Quit")
-//   } else {
-//     store.dispatch("Quit").then(() => {
-//       Message({
-//         type: 'error',
-//         message: '请重新登录',
-//         showClose: true
-//       })
-//       window.GLOBAL.vbus.$emit("GET_TOKEN_AND_LOGIN");
-//     })
-//   }
-// }
+function _needJumpLogin() {
+  store.dispatch('FedLogOut').then(() => {
+    Message({
+      type: 'error',
+      message: '请重新登录',
+      showClose: true
+    })
+    router.push('/login')
+  })
+}
 
 function _isJSON(str) {
   if (typeof str == 'string') {

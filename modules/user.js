@@ -10,19 +10,11 @@ Role.sync({ force: false });
 Token.sync({ force: false });
 
 module.exports = class {
-    // 根据用户名查找用户
-    static async findUserByName(userName) {
+    // 根据参数查找用户信息
+    static async findUserByParam(param) {
         return await User.findOne({
             where: {
-                userName
-            }
-        })
-    }
-    // 根据用户ID查找用户
-    static async findUserByUserId(id) {
-        return await User.findOne({
-            where: {
-                id
+                ...param
             }
         })
     }

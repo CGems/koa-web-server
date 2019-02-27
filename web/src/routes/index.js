@@ -22,7 +22,30 @@ export const constantRouterMap = [
         path: '/register',
         component: () => import( /* webpackChunkName: "register" */ 'Views/register'),
         hidden: true
+    },
+    {
+        path: '/404',
+        component: () => import( /* webpackChunkName: "404" */ 'Views/errorPage/404'),
+        hidden: true
+    },
+    {
+        path: '/401',
+        component: () => import( /* webpackChunkName: "401" */ 'Views/errorPage/401'),
+        hidden: true
+    },
+    {
+        path: '',
+        component: Layout,
+        redirect: 'dashboard',
+        children: [
+          {
+            path: 'dashboard',
+            component: () => import( /* webpackChunkName: "401" */ 'Views/errorPage/401'),
+            name: 'Dashboard',
+            meta: { title: 'dashboard', icon: 'dashboard', noCache: true, affix: true }
+          }
+        ]   
     }
 ]
 
-export const asyncRouterMap = []
+export const asyncRouterMap = [{ path: '*', redirect: '/404', hidden: true }]
