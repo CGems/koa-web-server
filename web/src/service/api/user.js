@@ -26,4 +26,12 @@ export default [{
     mockPath: '/user',
     params: {},
     options: {}
+}, {
+    name: 'logout',
+    method: 'POST',
+    desc: '服务端登出',
+    path: '/user/logout',
+    mockPath: '/user/logout',
+    params: {},
+    options: {}
 }]

@@ -2,6 +2,7 @@ import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 import store from 'Plugins/store';
 import { getToken } from 'Utils/auth';
+import { transformFilePathToRoute } from 'Utils/router';
 import router from 'Plugins/router'
 
 NProgress.configure({
@@ -20,10 +21,12 @@ export function routerBeforeEachFunc(to, from, next) {
       if (store.getters.userLoginStatus === 'notyet') { // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetUserInfo').then(() => { // 拉取user_info
           store.dispatch('GenerateRoutes').then(() => {
-            router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
+            router.addRoutes(transformFilePathToRoute(store.getters.addRouters)) // 动态添加可访问路由表
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
           })
         })
+      } else {
+        next()
       }
     }
   } else {

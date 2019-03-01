@@ -1,7 +1,7 @@
 import apiArr from 'Plugins/api'
 import { getToken, setToken, removeToken } from 'Utils/auth'
 
-const { userAuthenticate, logout, userGetUserInfo } = apiArr
+const { userAuthenticate, userLogout, userGetUserInfo } = apiArr
 
 const user = {
   state: {
@@ -54,9 +54,9 @@ const user = {
     },
 
     // 登出
-    LogOut({ commit, state }) {
+    LogOut({ commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        userLogout().then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLE', '')
           removeToken()

@@ -32,7 +32,11 @@ import {
     Popover,
     Select,
     Option,
-    Badge
+    Badge,
+    Scrollbar,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu
 } from 'element-ui'
 // 按需引入element-ui的部分功能
 Vue.use(Loading.directive);
@@ -71,5 +75,9 @@ Vue.use(Popover)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(Badge)
+Vue.use(Scrollbar)
+Vue.use(Dropdown)
+Vue.use(DropdownItem)
+Vue.use(DropdownMenu)
 
 ElementLocale.i18n((key, value) => i18n.t(key, value))
