@@ -135,4 +135,12 @@ module.exports = class {
             return true
         }
     }
+    // 用户登出
+    static async logout(ctx) {
+        await userModule.deleteLoginToken(ctx.state.userId)
+        responseFormatter({
+            ctx,
+            code: '1000'
+        })
+    }
 };

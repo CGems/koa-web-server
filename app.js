@@ -15,7 +15,6 @@ app.keys = ['cGXcA8DICAvqmXWdi1Nai3D3A3gLTeOdBJ8tPKLbfzl5t6Is4Z2D9qwLbOJuT6V']
 
 app.use(async (ctx, next) => {
     return next().then(() => {
-        console.log('1')
         if (ctx.status === 405) { // 方法不存在
             ctx.status = 200
             responseFormatter({

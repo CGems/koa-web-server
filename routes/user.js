@@ -15,5 +15,7 @@ router.post('/', koaBody(), userController.create)
 router.post('/login', koaBody(), userController.login)
 // 用户信息
 router.get('/', userController.getUserInfo)
+// 用户登出
+router.post('/logout', userController.logout)
 
 module.exports = router;
