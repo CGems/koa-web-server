@@ -50,14 +50,14 @@ export const constantRouterMap = [
 ]
 
 export const asyncRouterMap = [{
-    path: '/registerToken',
+    path: '/robotConfig',
     component: 'layout/Layout',
     children: [{
         path: 'index',
         name: 'registerToken',
         component: 'registerToken',
         meta: {
-            title: '注册码生成',
+            title: '机器人配置',
             icon: 'token',
             roles: ['admin', 'superAdmin']
         }
