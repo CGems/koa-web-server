@@ -1,6 +1,11 @@
 const moment = require('moment');
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('token', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
         token: {
             type: DataTypes.STRING,
             allowNull: false,

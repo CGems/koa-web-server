@@ -9,15 +9,13 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">
-          系统登录
-        </h3>
+        <h3 class="title">系统登录</h3>
         <!-- <lang-select class="set-language" /> -->
       </div>
 
       <el-form-item prop="userName">
         <span class="svg-container">
-          <svg-icon icon-class="user" />
+          <svg-icon icon-class="user"/>
         </span>
         <el-input
           v-model.trim="loginForm.userName"
@@ -30,7 +28,7 @@
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password" />
+          <svg-icon icon-class="password"/>
         </span>
         <el-input
           v-model.trim="loginForm.password"
@@ -41,9 +39,7 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-          />
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"/>
         </span>
       </el-form-item>
 
@@ -52,9 +48,8 @@
         type="primary"
         style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleLogin"
-      >
-        登录
-      </el-button>
+      >登录</el-button>
+      <router-link tag="div" to="/register" class="bottom-right-link pointer">立即注册</router-link>
     </el-form>
   </div>
 </template>
@@ -238,10 +233,10 @@ $light_gray: #eee;
     cursor: pointer;
     user-select: none;
   }
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
+  .bottom-right-link {
+    color: #fff;
+    text-align: right;
+    font-size: 14px;
   }
 }
 </style>

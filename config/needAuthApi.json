@@ -1,8 +1,14 @@
 {
     "GET": [
-        "^\/api\/v1\/user"
+        {
+            "path": "/api/v1/user",
+            "role": "all"
+        }
     ],
     "POST": [
-        "^\/api\/v1\/user\/logout"
+        {
+            "path": "/api/v1/user/logout",
+            "role": "all"
+        }
     ]
 }

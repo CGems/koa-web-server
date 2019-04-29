@@ -1,17 +1,20 @@
 const Koa = require('koa');
 const cors = require('koa2-cors');
 const json = require('koa-json');
-const index = require('./routes/index')
+const static = require('koa-static');
+const path = require('path');
+const index = require('./routes');
 const envConfig = require('./config')
-const needAuthApi = require('./config/needAuthApi.json')
 const { responseFormatter } = require('./utils/tolls')
-const authenticateMiddleware = require('./middlewares/authenticate.js')
+const authenticateMiddleware = require('./middlewares/authenticate')
 
 const app = new Koa();
+
+app.use(static(
+  path.join( __dirname,  './web_build')
+))
 app.use(cors());
 app.use(json());
-
-app.keys = ['cGXcA8DICAvqmXWdi1Nai3D3A3gLTeOdBJ8tPKLbfzl5t6Is4Z2D9qwLbOJuT6V']
 
 app.use(async (ctx, next) => {
     return next().then(() => {
@@ -22,30 +25,14 @@ app.use(async (ctx, next) => {
             })
         }
     }).catch(err => {
-        if (err.status === 401) { // 未通过认证（token过期或异常）
-            ctx.status = 401;
-            ctx.session = null;
-            responseFormatter({
-                ctx, code: '1004'
-            })
-        } else {
-            console.error(err)
-            responseFormatter({
-                ctx, code: '1001'
-            })
-        }
+        console.error(err)
+        responseFormatter({
+            ctx, code: '1001'
+        })
     })
 })
 
-app.use(authenticateMiddleware().unless((ctx) => {
-    for (let reg of needAuthApi[ctx.method]) {
-        reg = new RegExp(reg);
-        if (reg.test(ctx.path)) {
-            return false
-        }
-    }
-    return true
-}))
+app.use(authenticateMiddleware())
 
 app.use(async (ctx, next) => {
     const start = new Date()

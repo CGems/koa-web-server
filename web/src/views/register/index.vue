@@ -86,7 +86,7 @@ export default {
       if (!reg.test(value)) {
         callback(
           new Error(
-            "密码长度应在6至24个字符之间，至少1个大写字母，1个小写字母和1个数字"
+            "密码长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
           )
         );
         return;
@@ -104,7 +104,7 @@ export default {
         if (!reg.test(value)) {
           callback(
             new Error(
-              "密码长度应在6至24个字符之间，至少1个大写字母，1个小写字母和1个数字"
+              "密码长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
             )
           );
           return;
@@ -122,10 +122,10 @@ export default {
         userName: [
           { required: true, trigger: "blur", message: "请输入用户名" },
           {
-            min: 6,
+            min: 5,
             max: 20,
             trigger: "blur",
-            message: "用户名长度应在6至20之间"
+            message: "用户名长度应在5至20之间"
           }
         ],
         password: [
