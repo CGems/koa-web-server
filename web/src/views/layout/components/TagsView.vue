@@ -137,10 +137,10 @@ export default {
     },
     refreshSelectedTag(view) {
       this.$store.dispatch("delCachedView", view).then(() => {
-        const { fullPath } = view;
+        const { path } = view;
         this.$nextTick(() => {
           this.$router.replace({
-            path: "/redirect" + fullPath
+            path: "/redirect" + path
           });
         });
       });

@@ -57,7 +57,7 @@ export const asyncRouterMap = [{
         name: 'registerToken',
         component: 'registerToken',
         meta: {
-            title: '机器人配置',
+            title: '注册码',
             icon: 'token',
             roles: ['admin', 'superAdmin']
         }

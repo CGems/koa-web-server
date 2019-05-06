@@ -14,14 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: true
+            unique: true        
         },
         expireAt: {
             type: DataTypes.DATE,
-            allowNull: false,
-            get() {
-                return moment(this.getDataValue('expireAt')).format('YYYY-MM-DD HH:mm:ss')
-            }
+            allowNull: false
         }
     })
 }

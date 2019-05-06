@@ -34,4 +34,28 @@ export default [{
     mockPath: '/user/logout',
     params: {},
     options: {}
+}, {
+    name: 'apllyRegisterToken',
+    method: 'POST',
+    desc: '申请注册码',
+    path: '/user/registerToken',
+    mockPath: '/user/registerToken',
+    params: {},
+    options: {}
+}, {
+    name: 'getAllRegisterToken',
+    method: 'GET',
+    desc: '获取申请的所有注册码',
+    path: '/user/registerToken',
+    mockPath: '/user/registerToken',
+    params: {},
+    options: {}
+}, {
+    name: 'deleteRegisterToken',
+    method: 'DELETE',
+    desc: '删除未使用或过期注册码',
+    path: '/user/registerToken',
+    mockPath: '/user/registerToken',
+    params: {},
+    options: {}
 }]

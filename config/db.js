@@ -3,7 +3,6 @@ const envConfig = require('./../config/index')
 const sequelize = new Sequelize(envConfig.database, envConfig.databaseUsername, envConfig.databasePassword, {
     host: 'localhost',
     dialect: 'mysql',
-    operatorsAliases: false, // 禁用运算符别名
     dialectOptions: {
         supportBigNumbers: true
     },

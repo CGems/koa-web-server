@@ -9,7 +9,7 @@ module.exports = class {
     // 用户注册
     static async create(ctx) {
         const bodyData = ctx.request.body
-        if (bodyData.userName && bodyData.password && bodyData.passwordConfirm) {
+        if (bodyData && bodyData.userName && bodyData.password && bodyData.passwordConfirm) {
             if (bodyData.password !== bodyData.passwordConfirm) {
                 responseFormatter({
                     ctx, code: '1008'
@@ -32,7 +32,7 @@ module.exports = class {
                     return
                 }
                 // 查询用户名是否重复
-                const existUser = await userModule.findUserByParam({ userName: bodyData.userName })
+                const existUser = await userModule.findUserByUserName(bodyData.userName)
                 if (existUser) {
                     // 反馈存在用户名
                     responseFormatter({
@@ -40,7 +40,7 @@ module.exports = class {
                     })
                 } else {
                     // 查找普通用户的角色实例
-                    const role = await userModule.findRoleByParam({ roleName: 'user' });
+                    const role = await userModule.findRoleByRoleName('user');
                     // 加密密码
                     const salt = bcrypt.genSaltSync();
                     const hash = bcrypt.hashSync(bodyData.password, salt);
@@ -62,8 +62,8 @@ module.exports = class {
     // 用户登录
     static async login(ctx) {
         const bodyData = ctx.request.body
-        if (bodyData.userName && bodyData.password) {
-            const user = await userModule.findUserByParam({ userName: bodyData.userName });
+        if (bodyData && bodyData.userName && bodyData.password) {
+            const user = await userModule.findUserByUserName(bodyData.userName);
             // 判断用户是否存在
             if (user) {
                 // 判断前端传递的用户密码是否与数据库密码一致
@@ -127,6 +127,72 @@ module.exports = class {
     // 用户登出
     static async logout(ctx) {
         await userModule.deleteLoginToken(ctx.state.user.userId)
+        responseFormatter({
+            ctx,
+            code: '1000'
+        })
+    }
+    // 创建注册码
+    static async createRegisterToken(ctx) {
+        const bodyData = ctx.request.body;
+        if (bodyData && bodyData.desc) {
+            const token = crypto.randomBytes(4).toString('hex').toUpperCase();
+            const expireAt = moment().add(2, 'hours');
+            await userModule.createRegisterToken(ctx.state.user.userId, token, expireAt, bodyData.desc);
+            responseFormatter({
+                ctx,
+                code: '1000',
+                data: {
+                    token,
+                    expireAt: expireAt.format('YYYY-MM-DD HH:mm:ss')
+                }
+            })
+        } else {
+            // 入参不对
+            responseFormatter({
+                ctx,
+                code: '1003'
+            });
+        }
+    }
+    // 获取当前用户申请注册码情况
+    static async getRegisterTokenByUser(ctx) {
+        let result
+        if (ctx.state.user.roleName === 'superAdmin') {
+            result = await userModule.getAllRegisterToken();
+        } else {
+            result = await userModule.getRegisterTokenByUser(ctx.state.user.userId);
+        }
+        const userIds = new Set()
+        const userIdName = {}
+        result.forEach(item => {
+            userIds.add(item.applyUserId);
+            item.useUserId && userIds.add(item.useUserId);
+        })
+        const userInfo = await userModule.findUserByIds([...userIds])
+        userInfo.forEach(item => {
+            userIdName[item.id] = item.userName
+        })
+        result = result.map(item => {
+            return {
+                id: item.id,
+                token: item.token,
+                desc: item.desc,
+                createdAt: item.createdAt,
+                updateAt: item.updateAt,
+                expireAt: item.expireAt,
+                applyUserName: userIdName[item.applyUserId],
+                useUserName: item.useUserId ? userIdName[item.useUserId] : ''
+            }
+        })
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data: result
+        })
+    }
+    // 删除未使用或过期注册码
+    static async deleteRegisterToken(ctx) {
         responseFormatter({
             ctx,
             code: '1000'

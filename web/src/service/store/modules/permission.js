@@ -7,7 +7,7 @@ import { asyncRouterMap, constantRouterMap } from 'Routes'
  */
 function hasPermission(roleName, route) {
   if (route.meta && route.meta.roles) {
-    return route.meta.roles.includes(roleName)
+    return route.meta.roles === 'all' || route.meta.roles.includes(roleName)
   } else {
     return true
   }
@@ -25,8 +25,10 @@ function filterAsyncRouter(routes, roleName) {
     if (hasPermission(roleName, tmp)) {
       if (tmp.children) {
         tmp.children = filterAsyncRouter(tmp.children, roleName)
+        tmp.children.length > 0 && (res.push(tmp))
+      } else {
+        res.push(tmp)
       }
-      res.push(tmp)
     }
   })
 

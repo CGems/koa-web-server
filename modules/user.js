@@ -1,7 +1,11 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const sequelize = require('./../config/db')
 const User = sequelize.import('./../schema/user.js');
 const Role = sequelize.import('./../schema/role.js');
 const Token = sequelize.import('./../schema/token.js');
+const RegisterToken = sequelize.import('./../schema/registerToken.js');
+
 Role.sync({ force: false }).then(() => {
     Role.findOne({ where: { roleName: 'user' }, attributes: ['roleName'] }).then(result => {
         if (result === null) {
@@ -9,30 +13,43 @@ Role.sync({ force: false }).then(() => {
         }
     })
 });
-User.belongsTo(Role);
-Role.hasMany(User, { foreignKey: 'roleId' });
-User.hasOne(Token, { foreignKey: 'userId' });
-Token.belongsTo(User);
+User.belongsTo(Role, { foreignKey: 'roleId', constraints: false });
+Role.hasMany(User, { foreignKey: 'roleId', constraints: false });
+User.hasOne(Token, { foreignKey: 'userId', constraints: false });
+Token.belongsTo(User, { foreignKey: 'userId', constraints: false });
+User.hasMany(RegisterToken, { foreignKey: 'applyUserId', constraints: false });
+RegisterToken.belongsTo(User, { foreignKey: 'applyUserId', constraints: false });
 User.sync({ force: false }).then(() => {
-    User.findOrCreate({ defaults: { userName: 'wwh', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '3' }, where: { userName: 'wwh' } })
+    User.findOrCreate({ defaults: { userName: 'admin', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '3' }, where: { userName: 'admin' } })
 });
 Token.sync({ force: false });
-
+RegisterToken.sync({ force: false });
 module.exports = class userModule {
     // 根据参数查找用户信息
-    static async findUserByParam(param) {
+    static async findUserByUserName(userName) {
         return await User.findOne({
             where: {
-                ...param
+                userName
             },
             include: [Role]
         })
     }
     // 根据参数查找角色信息
-    static async findRoleByParam(param) {
+    static async findUserByIds(ids) {
+        return await User.findAll({
+            where: {
+                id: {
+                    [Op.in]: ids
+                }
+            },
+            attributes: ['userName', 'id']
+        })
+    }
+    // 根据参数查找角色信息
+    static async findRoleByRoleName(roleName) {
         return await Role.findOne({
             where: {
-                ...param
+                roleName
             }
         })
     }
@@ -59,5 +76,27 @@ module.exports = class userModule {
                 ...param
             }
         })
+    }
+    // 创建注册码
+    static async createRegisterToken(applyUserId, token, expireAt, desc) {
+        return await RegisterToken.create({ applyUserId, token, expireAt, desc, isUsed: false })
+    }
+    // 获取当前用户创建的注册码`
+    static async getRegisterTokenByUser(userId) {
+        return await RegisterToken.findAll({
+            order: [['id', 'DESC']], where: { applyUserId: userId }
+        })
+    }
+    // 获取所有用户创建的注册码
+    static async getAllRegisterToken() {
+        return await RegisterToken.findAll({
+            order: [['id', 'DESC']]
+        })
+    }
+    // 删除未使用或过期注册码
+    static async deleteRegisterToken(userId, roleName) {
+        const condition = { order: [['id', 'DESC']] };
+        (roleName === 'superAdmin') && (condition.where = { applyUserId: userId })
+        return await RegisterToken.findAll(condition)
     }
 }

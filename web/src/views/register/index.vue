@@ -70,6 +70,7 @@
       >
         注册
       </el-button>
+      <router-link tag="div" to="/login" class="bottom-right-link pointer">立即登录</router-link>
     </el-form>
   </div>
 </template>
@@ -292,10 +293,10 @@ $light_gray: #eee;
     cursor: pointer;
     user-select: none;
   }
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
+  .bottom-right-link {
+    color: #fff;
+    text-align: right;
+    font-size: 14px;
   }
 }
 </style>

@@ -2,13 +2,27 @@
     "GET": [
         {
             "path": "/api/v1/user",
-            "role": "all"
+            "roles": "all"
+        },
+        {
+            "path": "/api/v1/user/registerToken",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
         }
     ],
     "POST": [
         {
             "path": "/api/v1/user/logout",
-            "role": "all"
+            "roles": "all"
+        },
+        {
+            "path": "/api/v1/user/registerToken",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
         }
     ]
 }
