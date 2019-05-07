@@ -22,6 +22,6 @@ router.post('/registerToken', koaBody(), userController.createRegisterToken)
 // 获取当前用户所有注册码情况
 router.get('/registerToken', userController.getRegisterTokenByUser)
 // 删除注册码
-router.delete('/registerToken', koaBody(), userController.deleteRegisterToken)
+router.delete('/registerToken/:id', userController.deleteRegisterToken)
 
 module.exports = router;

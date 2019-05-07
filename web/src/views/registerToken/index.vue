@@ -151,7 +151,12 @@ export default {
     },
     async deleteRegisterToken(id) {
       try {
-        await this.$api["userDeleteRegisterToken"]({ id });
+        await this.$api["userDeleteRegisterToken"](
+          {},
+          {
+            url: `/user/registerToken/${id}`
+          }
+        );
         this.getAllRegisterToken();
         this.$message({ type: "success", message: "删除成功" });
       } catch (error) {

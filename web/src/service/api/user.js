@@ -54,8 +54,8 @@ export default [{
     name: 'deleteRegisterToken',
     method: 'DELETE',
     desc: '删除未使用或过期注册码',
-    path: '/user/registerToken',
-    mockPath: '/user/registerToken',
+    path: '/user/registerToken/:id',
+    mockPath: '/user/registerToken/:id',
     params: {},
     options: {}
 }]

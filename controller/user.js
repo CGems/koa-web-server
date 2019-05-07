@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const moment = require('moment');
-
+const sequelize = require('./../config/db')
 const { responseFormatter } = require('./../utils/tolls');
 const userModule = require('./../modules/user');
 
@@ -137,7 +137,7 @@ module.exports = class {
         const bodyData = ctx.request.body;
         if (bodyData && bodyData.desc) {
             const token = crypto.randomBytes(4).toString('hex').toUpperCase();
-            const expireAt = moment().add(2, 'hours');
+            const expireAt = moment().add(12, 'hours');
             await userModule.createRegisterToken(ctx.state.user.userId, token, expireAt, bodyData.desc);
             responseFormatter({
                 ctx,
@@ -179,8 +179,9 @@ module.exports = class {
                 token: item.token,
                 desc: item.desc,
                 createdAt: item.createdAt,
-                updateAt: item.updateAt,
+                updatedAt: item.updatedAt,
                 expireAt: item.expireAt,
+                isUsed: item.isUsed,
                 applyUserName: userIdName[item.applyUserId],
                 useUserName: item.useUserId ? userIdName[item.useUserId] : ''
             }
@@ -193,9 +194,43 @@ module.exports = class {
     }
     // 删除未使用或过期注册码
     static async deleteRegisterToken(ctx) {
-        responseFormatter({
-            ctx,
-            code: '1000'
-        })
+        const { userId, roleName } = ctx.state.user;
+        const paramData = ctx.params
+        if (paramData && paramData.id) {
+            const registerToken = await userModule.getRegisterTokenById(paramData.id)
+            if (registerToken) {
+                if (registerToken.applyUserId === userId || roleName === 'superAdmin') { // 是该用户申请或超级管理员删除
+                    if (registerToken.isUsed) {
+                        responseFormatter({
+                            ctx,
+                            code: '1015'
+                        })
+                    } else {
+                        await userModule.deleteRegisterToken(paramData.id)
+                        responseFormatter({
+                            ctx,
+                            code: '1000'
+                        })
+                    }
+                } else {
+                    responseFormatter({
+                        ctx,
+                        code: '1014'
+                    })
+                }
+
+            } else {
+                responseFormatter({
+                    ctx,
+                    code: '1013'
+                })
+            }
+        } else {
+            // 入参不对
+            responseFormatter({
+                ctx,
+                code: '1003'
+            });
+        }
     }
 };

@@ -94,9 +94,11 @@ module.exports = class userModule {
         })
     }
     // 删除未使用或过期注册码
-    static async deleteRegisterToken(userId, roleName) {
-        const condition = { order: [['id', 'DESC']] };
-        (roleName === 'superAdmin') && (condition.where = { applyUserId: userId })
-        return await RegisterToken.findAll(condition)
+    static async deleteRegisterToken(id) {
+        return await RegisterToken.destroy({ where: { id } })
+    }
+    // 根据注册码id查找注册码
+    static async getRegisterTokenById(id) {
+        return await RegisterToken.findOne({ where: { id } })
     }
 }

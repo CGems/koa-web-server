@@ -24,5 +24,14 @@
                 "superAdmin"
             ]
         }
+    ],
+    "DELETE": [
+        {
+            "path": "/api/v1/user/registerToken/:id",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
+        }
     ]
 }
