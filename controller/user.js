@@ -41,17 +41,29 @@ module.exports = class {
                 } else {
                     const registerToken = await userModule.getRegisterTokenByToken(bodyData.token);
                     if (registerToken) {
-                        // 查找普通用户的角色实例
-                        const role = await userModule.findRoleByRoleName('user');
-                        // 加密密码
-                        const salt = bcrypt.genSaltSync();
-                        const hash = bcrypt.hashSync(bodyData.password, salt);
-                        // 创建用户并绑定为普通用户
-                        const newUser = await role.createUser({ userName: bodyData.userName, password: hash });
-                        await userModule.useRegisterToken(registerToken.id, newUser.id);
-                        responseFormatter({
-                            ctx, code: '1000'
-                        })
+                        if (registerToken.isUsed) {
+                            responseFormatter({
+                                ctx,
+                                code: '1015'
+                            })
+                        } else if (moment(registerToken.expireAt).isSameOrBefore(new Date())) {
+                            responseFormatter({
+                                ctx,
+                                code: '1016'
+                            })
+                        } else {
+                            // 查找普通用户的角色实例
+                            const role = await userModule.findRoleByRoleName('user');
+                            // 加密密码
+                            const salt = bcrypt.genSaltSync();
+                            const hash = bcrypt.hashSync(bodyData.password, salt);
+                            // 创建用户并绑定为普通用户
+                            const newUser = await role.createUser({ userName: bodyData.userName, password: hash });
+                            await userModule.useRegisterToken(registerToken.id, newUser.id);
+                            responseFormatter({
+                                ctx, code: '1000'
+                            })
+                        }
                     } else {
                         responseFormatter({
                             ctx,
