@@ -15,7 +15,7 @@
         <template slot-scope="scope">{{ scope.row.expireAt | parseTime }}</template>
       </el-table-column>
       <el-table-column prop="applyUserName" label="申请者" width="100"></el-table-column>
-      <el-table-column prop="useUserId" label="使用者" width="100"></el-table-column>
+      <el-table-column prop="useUserName" label="使用者" width="100"></el-table-column>
       <el-table-column label="使用时间" width="160">
         <template slot-scope="scope" v-if="scope.row.isUsed">{{ scope.row.updatedAt | parseTime}}</template>
         <template v-else></template>
