@@ -9,15 +9,13 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">
-          系统注册
-        </h3>
+        <h3 class="title">系统注册</h3>
         <!-- <lang-select class="set-language" /> -->
       </div>
 
       <el-form-item prop="userName">
         <span class="svg-container">
-          <svg-icon icon-class="user" />
+          <svg-icon icon-class="user"/>
         </span>
         <el-input
           v-model.trim="registerForm.userName"
@@ -30,7 +28,7 @@
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <svg-icon icon-class="password" />
+          <svg-icon icon-class="password"/>
         </span>
         <el-input
           v-model.trim="registerForm.password"
@@ -40,14 +38,12 @@
           auto-complete="on"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-          />
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"/>
         </span>
       </el-form-item>
       <el-form-item prop="passwordConfirm">
         <span class="svg-container">
-          <svg-icon icon-class="password" />
+          <svg-icon icon-class="password"/>
         </span>
         <el-input
           v-model.trim="registerForm.passwordConfirm"
@@ -57,19 +53,27 @@
           auto-complete="on"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-          />
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"/>
         </span>
+      </el-form-item>
+      <el-form-item prop="token">
+        <span class="svg-container">
+          <svg-icon icon-class="token"/>
+        </span>
+        <el-input
+          v-model.trim="registerForm.token"
+          placeholder="注册码"
+          name="token"
+          type="text"
+          auto-complete="off"
+        />
       </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
         style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleRegister"
-      >
-        注册
-      </el-button>
+      >注册</el-button>
       <router-link tag="div" to="/login" class="bottom-right-link pointer">立即登录</router-link>
     </el-form>
   </div>
@@ -87,7 +91,7 @@ export default {
       if (!reg.test(value)) {
         callback(
           new Error(
-            "密码长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
+            "长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
           )
         );
         return;
@@ -105,7 +109,7 @@ export default {
         if (!reg.test(value)) {
           callback(
             new Error(
-              "密码长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
+              "长度应为6至24之间，至少1个大写字母，1个小写字母和1个数字，不允许特殊字符"
             )
           );
           return;
@@ -117,7 +121,8 @@ export default {
       registerForm: {
         userName: "",
         password: "",
-        passwordConfirm: ""
+        passwordConfirm: "",
+        token: ""
       },
       registerRules: {
         userName: [
@@ -136,7 +141,8 @@ export default {
         passwordConfirm: [
           { required: true, trigger: "blur", message: "请输入密码" },
           { trigger: "blur", validator: validatePasswordConfirm }
-        ]
+        ],
+        token: [{ required: true, trigger: "blur", message: "请输入注册码" }]
       },
       passwordType: "password",
       loading: false,
@@ -155,11 +161,7 @@ export default {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true;
-          this.$api["userRegister"]({
-            userName: this.registerForm.userName,
-            password: this.registerForm.password,
-            passwordConfirm: this.registerForm.passwordConfirm
-          })
+          this.$api["userRegister"](this.registerForm)
             .then(() => {
               this.loading = false;
               this.$message({

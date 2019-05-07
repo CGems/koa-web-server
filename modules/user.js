@@ -101,4 +101,12 @@ module.exports = class userModule {
     static async getRegisterTokenById(id) {
         return await RegisterToken.findOne({ where: { id } })
     }
+    // 根据注册码id查找注册码
+    static async getRegisterTokenByToken(token) {
+        return await RegisterToken.findOne({ where: { token } })
+    }
+    // 使用注册码
+    static async useRegisterToken(id, useUserId) {
+        return await RegisterToken.update({ useUserId, isUsed: true }, { where: { id } })
+    }
 }

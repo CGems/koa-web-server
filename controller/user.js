@@ -9,7 +9,7 @@ module.exports = class {
     // 用户注册
     static async create(ctx) {
         const bodyData = ctx.request.body
-        if (bodyData && bodyData.userName && bodyData.password && bodyData.passwordConfirm) {
+        if (bodyData && bodyData.userName && bodyData.password && bodyData.passwordConfirm && bodyData.token) {
             if (bodyData.password !== bodyData.passwordConfirm) {
                 responseFormatter({
                     ctx, code: '1008'
@@ -39,16 +39,25 @@ module.exports = class {
                         ctx, code: '1007'
                     })
                 } else {
-                    // 查找普通用户的角色实例
-                    const role = await userModule.findRoleByRoleName('user');
-                    // 加密密码
-                    const salt = bcrypt.genSaltSync();
-                    const hash = bcrypt.hashSync(bodyData.password, salt);
-                    // 创建用户并绑定为普通用户
-                    await role.createUser({ userName: bodyData.userName, password: hash });
-                    responseFormatter({
-                        ctx, code: '1000'
-                    })
+                    const registerToken = await userModule.getRegisterTokenByToken(bodyData.token);
+                    if (registerToken) {
+                        // 查找普通用户的角色实例
+                        const role = await userModule.findRoleByRoleName('user');
+                        // 加密密码
+                        const salt = bcrypt.genSaltSync();
+                        const hash = bcrypt.hashSync(bodyData.password, salt);
+                        // 创建用户并绑定为普通用户
+                        const newUser = await role.createUser({ userName: bodyData.userName, password: hash });
+                        await userModule.useRegisterToken(registerToken.id, newUser.id);
+                        responseFormatter({
+                            ctx, code: '1000'
+                        })
+                    } else {
+                        responseFormatter({
+                            ctx,
+                            code: '1013'
+                        })
+                    }
                 }
             }
         } else {
