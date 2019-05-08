@@ -32,44 +32,62 @@ module.exports = class {
                     return
                 }
                 // 查询用户名是否重复
-                const existUser = await userModule.findUserByUserName(bodyData.userName)
-                if (existUser) {
-                    // 反馈存在用户名
-                    responseFormatter({
-                        ctx, code: '1007'
+                let t = await sequelize.transaction();
+                try {
+                    const existUser = await sequelize.model('user').findOne({
+                        where: {
+                            userName: bodyData.userName
+                        },
+                        transcation: t
                     })
-                } else {
-                    const registerToken = await userModule.getRegisterTokenByToken(bodyData.token);
-                    if (registerToken) {
-                        if (registerToken.isUsed) {
-                            responseFormatter({
-                                ctx,
-                                code: '1015'
-                            })
-                        } else if (moment(registerToken.expireAt).isSameOrBefore(new Date())) {
-                            responseFormatter({
-                                ctx,
-                                code: '1016'
-                            })
+                    if (existUser) {
+                        // 反馈存在用户名
+                        responseFormatter({
+                            ctx, code: '1007'
+                        })
+                    } else {
+                        const registerToken = await sequelize.model('registerToken').findOne({
+                            where: { token: bodyData.token },
+                            transcation: t, lock: true
+                        });
+                        if (registerToken) {
+                            if (registerToken.isUsed) {
+                                responseFormatter({
+                                    ctx,
+                                    code: '1015'
+                                })
+                            } else if (moment(registerToken.expireAt).isSameOrBefore(new Date())) {
+                                responseFormatter({
+                                    ctx,
+                                    code: '1016'
+                                })
+                            } else {
+                                // 查找普通用户的角色实例
+                                const role = await userModule.findRoleByRoleName('user');
+                                // 加密密码
+                                const salt = bcrypt.genSaltSync();
+                                const hash = bcrypt.hashSync(bodyData.password, salt);
+                                // 创建用户并绑定为普通用户
+                                const newUser = await role.createUser({ userName: bodyData.userName, password: hash }, { transcation: t });
+                                await userModule.useRegisterToken(registerToken.id, newUser.id);
+                                responseFormatter({
+                                    ctx, code: '1000'
+                                })
+                            }
                         } else {
-                            // 查找普通用户的角色实例
-                            const role = await userModule.findRoleByRoleName('user');
-                            // 加密密码
-                            const salt = bcrypt.genSaltSync();
-                            const hash = bcrypt.hashSync(bodyData.password, salt);
-                            // 创建用户并绑定为普通用户
-                            const newUser = await role.createUser({ userName: bodyData.userName, password: hash });
-                            await userModule.useRegisterToken(registerToken.id, newUser.id);
                             responseFormatter({
-                                ctx, code: '1000'
+                                ctx,
+                                code: '1013'
                             })
                         }
-                    } else {
-                        responseFormatter({
-                            ctx,
-                            code: '1013'
-                        })
                     }
+                    t.commit()
+                } catch (error) {
+                    await t.rollback()
+                    responseFormatter({
+                        ctx,
+                        code: '1010'
+                    })
                 }
             }
         } else {
@@ -159,15 +177,29 @@ module.exports = class {
         if (bodyData && bodyData.desc) {
             const token = crypto.randomBytes(4).toString('hex').toUpperCase();
             const expireAt = moment().add(12, 'hours');
-            await userModule.createRegisterToken(ctx.state.user.userId, token, expireAt, bodyData.desc);
-            responseFormatter({
-                ctx,
-                code: '1000',
-                data: {
-                    token,
-                    expireAt: expireAt.format('YYYY-MM-DD HH:mm:ss')
+            try {
+                await userModule.createRegisterToken(ctx.state.user.userId, token, expireAt, bodyData.desc);
+                responseFormatter({
+                    ctx,
+                    code: '1000',
+                    data: {
+                        token,
+                        expireAt: expireAt.format('YYYY-MM-DD HH:mm:ss')
+                    }
+                })
+            } catch (error) {
+                if (error.name === 'SequelizeUniqueConstraintError') { // token生成重复
+                    responseFormatter({
+                        ctx,
+                        code: '1010'
+                    });
+                    return
                 }
-            })
+                responseFormatter({
+                    ctx,
+                    code: '1003'
+                });
+            }
         } else {
             // 入参不对
             responseFormatter({
@@ -218,34 +250,45 @@ module.exports = class {
         const { userId, roleName } = ctx.state.user;
         const paramData = ctx.params
         if (paramData && paramData.id) {
-            const registerToken = await userModule.getRegisterTokenById(paramData.id)
-            if (registerToken) {
-                if (registerToken.applyUserId === userId || roleName === 'superAdmin') { // 是该用户申请或超级管理员删除
-                    if (registerToken.isUsed) {
-                        responseFormatter({
-                            ctx,
-                            code: '1015'
-                        })
+            let t = await sequelize.transaction();
+            try {
+                const registerToken = await sequelize.model('registerToken').findOne({ where: { id: paramData.id }, transaction: t, lock: true })
+                if (registerToken) {
+                    if (registerToken.applyUserId === userId || roleName === 'superAdmin') { // 是该用户申请或超级管理员删除
+                        if (registerToken.isUsed) {
+                            responseFormatter({
+                                ctx,
+                                code: '1015'
+                            })
+                        } else {
+                            await await sequelize.model('registerToken').destroy({ where: { id: paramData.id }, transaction: t })
+                            responseFormatter({
+                                ctx,
+                                code: '1000'
+                            })
+                        }
                     } else {
-                        await userModule.deleteRegisterToken(paramData.id)
                         responseFormatter({
                             ctx,
-                            code: '1000'
+                            code: '1014'
                         })
                     }
+
                 } else {
                     responseFormatter({
                         ctx,
-                        code: '1014'
+                        code: '1013'
                     })
                 }
-
-            } else {
+                await t.commit()
+            } catch (error) {
+                await t.rollback()
                 responseFormatter({
                     ctx,
-                    code: '1013'
+                    code: '1010'
                 })
             }
+
         } else {
             // 入参不对
             responseFormatter({

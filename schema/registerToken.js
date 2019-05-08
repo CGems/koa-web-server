@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         token: {
             type: DataTypes.STRING,
-            // unique: true,
+            unique: true,
             allowNull: false,
             comment: '注册码'
         },

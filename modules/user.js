@@ -20,7 +20,7 @@ Token.belongsTo(User, { foreignKey: 'userId', constraints: false });
 User.hasMany(RegisterToken, { foreignKey: 'applyUserId', constraints: false });
 RegisterToken.belongsTo(User, { foreignKey: 'applyUserId', constraints: false });
 User.sync({ force: false }).then(() => {
-    User.findOrCreate({ defaults: { userName: 'admin', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '3' }, where: { userName: 'admin' } })
+    User.findCreateFind({ defaults: { userName: 'admin', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '3' }, where: { userName: 'admin' } })
 });
 Token.sync({ force: false });
 RegisterToken.sync({ force: false });
@@ -98,7 +98,7 @@ module.exports = class userModule {
         return await RegisterToken.destroy({ where: { id } })
     }
     // 根据注册码id查找注册码
-    static async getRegisterTokenById(id) {
+    static async getRegisterTokenById(id, t) {
         return await RegisterToken.findOne({ where: { id } })
     }
     // 根据注册码id查找注册码
