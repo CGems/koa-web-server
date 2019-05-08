@@ -18,6 +18,15 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        parentId: {
+            type: DataTypes.INTEGER
         }
-    })
+    }, {
+            defaultScope: {
+                attributes: {
+                    exclude: ['password']
+                }
+            }
+        })
 }

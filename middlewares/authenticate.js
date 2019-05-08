@@ -30,7 +30,6 @@ module.exports = function () {
                     if (match.roles === 'all' || match.roles.includes(ctx.state.user.roleName)) {
                         await next()
                     } else {
-                        ctx.status = 403;
                         responseFormatter({
                             ctx, code: '1005'
                         })

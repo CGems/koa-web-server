@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const moment = require('moment');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const sequelize = require('./../config/db')
 const { responseFormatter } = require('./../utils/tolls');
 const userModule = require('./../modules/user');
@@ -68,7 +70,7 @@ module.exports = class {
                                 const salt = bcrypt.genSaltSync();
                                 const hash = bcrypt.hashSync(bodyData.password, salt);
                                 // 创建用户并绑定为普通用户
-                                const newUser = await role.createUser({ userName: bodyData.userName, password: hash }, { transcation: t });
+                                const newUser = await role.createUser({ userName: bodyData.userName, password: hash, parentId: registerToken.applyUserId }, { transcation: t });
                                 await userModule.useRegisterToken(registerToken.id, newUser.id);
                                 responseFormatter({
                                     ctx, code: '1000'
@@ -296,5 +298,47 @@ module.exports = class {
                 code: '1003'
             });
         }
+    }
+    // 获取用户管理信息
+    static async getUserManage(ctx) {
+        const { userId, roleName, userName } = ctx.state.user;
+        const roleChart = {user:'普通用户',admin:'管理员',superAdmin:'超级管理员'}
+        let data;
+        let userData = [];
+        if (roleName === 'admin') {
+            data = await sequelize.model('user').findAll({ where: { parentId: userId }, include: ['role'] });
+            userData = data.map(item => {
+                return {
+                    userName: item.userName,
+                    roleName: roleChart[item.role.roleName],
+                    parentName: userName,
+                    remark: item.remark
+                }
+            })
+        } else if (roleName === 'superAdmin') {
+            data = await sequelize.model('user').findAll({ include: ['role'] });
+            const adminIdName = {}
+            data.forEach(item=>{
+                if(item.role.roleName!=='user'){
+                    adminIdName[item.id] = item.userName
+                }
+                if(item.role.roleName!=='superAdmin'){
+                    userData.push(item)
+                }
+            })
+            userData = userData.map(item => {
+                return {
+                    userName: item.userName,
+                    roleName: roleChart[item.role.roleName],
+                    parentName: item.parentId?adminIdName[item.parentId]:'',
+                    remark: item.remark
+                }
+            })
+        }
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data: userData
+        })
     }
 };

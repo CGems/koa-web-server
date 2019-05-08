@@ -10,6 +10,13 @@
                 "admin",
                 "superAdmin"
             ]
+        },
+        {
+            "path": "/api/v1/user/manage",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
         }
     ],
     "POST": [

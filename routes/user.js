@@ -11,10 +11,12 @@ const router = new Router();
 
 // 注册 
 router.post('/', koaBody(), userController.create)
-// 登录
-router.post('/login', koaBody(), userController.login)
 // 用户信息
 router.get('/', userController.getUserInfo)
+// 用户管理列表
+router.get('/manage', userController.getUserManage)
+// 登录
+router.post('/login', koaBody(), userController.login)
 // 用户登出
 router.post('/logout', userController.logout)
 // 申请注册码

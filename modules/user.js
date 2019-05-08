@@ -25,9 +25,9 @@ User.sync({ force: false }).then(() => {
 Token.sync({ force: false });
 RegisterToken.sync({ force: false });
 module.exports = class userModule {
-    // 根据参数查找用户信息
+    // 根据参数查找用户信息(能查到密码)
     static async findUserByUserName(userName) {
-        return await User.findOne({
+        return await User.unscoped().findOne({
             where: {
                 userName
             },
