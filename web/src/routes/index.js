@@ -50,7 +50,7 @@ export const constantRouterMap = [
 ]
 
 export const asyncRouterMap = [{
-    path: '/robotConfig',
+    path: '/registerToken',
     component: 'layout/Layout',
     children: [{
         path: 'index',
@@ -59,8 +59,23 @@ export const asyncRouterMap = [{
         meta: {
             title: '注册码',
             icon: 'token',
-            roles: ['admin', 'superAdmin']
+            roles: ['admin', 'superAdmin'],
+            noCache: true
         }
     }]
 
+}, {
+    path: '/userManage',
+    component: 'layout/Layout',
+    children: [{
+        path: 'index',
+        name: 'userManage',
+        component: 'userManage',
+        meta: {
+            title: '用户管理',
+            icon: 'user',
+            roles: ['admin', 'superAdmin'],
+            noCache: true
+        }
+    }]
 }, { path: '*', redirect: '/404', hidden: true }]

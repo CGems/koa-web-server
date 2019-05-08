@@ -80,6 +80,7 @@
 import { parseTime } from "Filters";
 import moment from "moment";
 export default {
+  name: 'registerToken',
   data() {
     return {
       isBtnLoading: false,

@@ -27,6 +27,14 @@ export default [{
     params: {},
     options: {}
 }, {
+    name: 'getUserManage',
+    method: 'GET',
+    desc: '获取用户管理信息',
+    path: '/user/manage',
+    mockPath: '/user/manage',
+    params: {},
+    options: {}
+}, {
     name: 'logout',
     method: 'POST',
     desc: '服务端登出',
