@@ -366,11 +366,15 @@ module.exports = class {
             if (bodyData.roleName) {
                 const { userId, roleName } = ctx.state.user;
                 const roleList = await sequelize.model('role').findAll()
+                let readyRole; // 即将被赋予的角色
                 let roleIndex = {}
                 roleList.forEach(item => {
                     roleIndex[item.roleName] = item.index
+                    if(item.roleName===bodyData.roleName){
+                        readyRole = item
+                    }
                 })
-                if (roleIndex[bodyData.roleName] === undefined) {
+                if (readyRole === undefined) {
                     // 入参不对
                     responseFormatter({
                         ctx,
@@ -382,12 +386,15 @@ module.exports = class {
                     // 修改人的角色小于被修改人的即将修改角色 则失败
                     responseFormatter({
                         ctx,
-                        code: '1005',
+                        code: '1017',
+                        msgObj:{
+                            roleName: readyRole.desc
+                        }
                     })
                     return
                 }
                 userModule.deleteLoginToken(modifiedPersonId) // 删除被修改用户的token
-                bodyData.roleId = roleList.find(item => { return item.roleName === bodyData.roleName }).id
+                bodyData.roleId = readyRole.id
                 delete bodyData.roleName
             }
             await sequelize.model('user').update(bodyData, { where: { id: modifiedPersonId } })
