@@ -17,6 +17,13 @@
                 "admin",
                 "superAdmin"
             ]
+        },
+        {
+            "path": "/api/v1/user/role",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
         }
     ],
     "POST": [
@@ -26,6 +33,15 @@
         },
         {
             "path": "/api/v1/user/registerToken",
+            "roles": [
+                "admin",
+                "superAdmin"
+            ]
+        }
+    ],
+    "PUT": [
+        {
+            "path": "/api/v1/user/manage/:id",
             "roles": [
                 "admin",
                 "superAdmin"

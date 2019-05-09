@@ -20,7 +20,7 @@
         <template slot-scope="scope" v-if="scope.row.isUsed">{{ scope.row.updatedAt | parseTime}}</template>
         <template v-else></template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="60">
+      <el-table-column label="操作" width="60">
         <template slot-scope="scope">
           <el-button
             v-if="scope.row.status!=='已使用'"

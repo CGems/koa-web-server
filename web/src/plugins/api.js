@@ -77,10 +77,10 @@ class MakeApi {
 }
 
 function _normoalize(options, data) {
-  if (options.method === 'POST' || options.method === 'DELETE') {
-    options.data = data
-  } else if (options.method === 'GET') {
+  if (options.method === 'GET') {
     options.params = data
+  } else {
+    options.data = data
   }
   return options
 }

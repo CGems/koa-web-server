@@ -13,12 +13,16 @@ const router = new Router();
 router.post('/', koaBody(), userController.create)
 // 用户信息
 router.get('/', userController.getUserInfo)
-// 用户管理列表
-router.get('/manage', userController.getUserManage)
 // 登录
 router.post('/login', koaBody(), userController.login)
 // 用户登出
 router.post('/logout', userController.logout)
+// 用户管理列表
+router.get('/manage', userController.getUserManage)
+// 更新用户管理信息
+router.put('/manage/:id', koaBody(), userController.updateUserManage)
+// 获取角色列表
+router.get('/role', userController.getRole)
 // 申请注册码
 router.post('/registerToken', koaBody(), userController.createRegisterToken)
 // 获取当前用户所有注册码情况

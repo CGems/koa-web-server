@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         parentId: {
             type: DataTypes.INTEGER
+        },
+        remark: {
+            type: DataTypes.STRING
         }
     }, {
             defaultScope: {

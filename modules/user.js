@@ -9,7 +9,7 @@ const RegisterToken = sequelize.import('./../schema/registerToken.js');
 Role.sync({ force: false }).then(() => {
     Role.findOne({ where: { roleName: 'user' }, attributes: ['roleName'] }).then(result => {
         if (result === null) {
-            Role.bulkCreate([{ roleName: 'user', desc: '普通用户' }, { roleName: 'admin', desc: '管理员' }, { roleName: 'superAdmin', desc: '超级管理员' }])
+            Role.bulkCreate([{ roleName: 'superAdmin', desc: '超级管理员', index: '1' }, { roleName: 'admin', desc: '管理员', index: '2' },{ roleName: 'user', desc: '普通用户', index: '3' } ])
         }
     })
 });
@@ -20,7 +20,7 @@ Token.belongsTo(User, { foreignKey: 'userId', constraints: false });
 User.hasMany(RegisterToken, { foreignKey: 'applyUserId', constraints: false });
 RegisterToken.belongsTo(User, { foreignKey: 'applyUserId', constraints: false });
 User.sync({ force: false }).then(() => {
-    User.findCreateFind({ defaults: { userName: 'admin', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '3' }, where: { userName: 'admin' } })
+    User.findCreateFind({ defaults: { userName: 'admin', password: '$2a$10$y1ifXaN7gN4OP52zf8z1NeEY1C8wBoSdM4eWhFN4zmxMUxIZ73r.i', roleId: '1' }, where: { userName: 'admin' } })
 });
 Token.sync({ force: false });
 RegisterToken.sync({ force: false });

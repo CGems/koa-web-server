@@ -302,36 +302,41 @@ module.exports = class {
     // 获取用户管理信息
     static async getUserManage(ctx) {
         const { userId, roleName, userName } = ctx.state.user;
-        const roleChart = {user:'普通用户',admin:'管理员',superAdmin:'超级管理员'}
         let data;
         let userData = [];
         if (roleName === 'admin') {
             data = await sequelize.model('user').findAll({ where: { parentId: userId }, include: ['role'] });
             userData = data.map(item => {
                 return {
+                    id: item.id,
                     userName: item.userName,
-                    roleName: roleChart[item.role.roleName],
+                    roleName: item.role.roleName,
                     parentName: userName,
-                    remark: item.remark
+                    remark: item.remark,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt
                 }
             })
         } else if (roleName === 'superAdmin') {
             data = await sequelize.model('user').findAll({ include: ['role'] });
             const adminIdName = {}
-            data.forEach(item=>{
-                if(item.role.roleName!=='user'){
+            data.forEach(item => {
+                if (item.role.roleName !== 'user') {
                     adminIdName[item.id] = item.userName
                 }
-                if(item.role.roleName!=='superAdmin'){
+                if (item.role.roleName !== 'superAdmin') {
                     userData.push(item)
                 }
             })
             userData = userData.map(item => {
                 return {
+                    id: item.id,
                     userName: item.userName,
-                    roleName: roleChart[item.role.roleName],
-                    parentName: item.parentId?adminIdName[item.parentId]:'',
-                    remark: item.remark
+                    roleName: item.role.roleName,
+                    parentName: item.parentId ? adminIdName[item.parentId] : '',
+                    remark: item.remark,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt
                 }
             })
         }
@@ -339,6 +344,72 @@ module.exports = class {
             ctx,
             code: '1000',
             data: userData
+        })
+    }
+    // 用户管理信息更新
+    static async updateUserManage(ctx) {
+        const bodyData = ctx.request.body;
+        const modifiedPersonId = ctx.params.id;
+        if (bodyData) {
+            const canUpdateAttributes = ['roleName', 'remark'];
+            // 检测是否传入了别的参数
+            if (Object.keys(bodyData).some(item => {
+                return !canUpdateAttributes.includes(item)
+            })) {
+                // 入参不对
+                responseFormatter({
+                    ctx,
+                    code: '1003'
+                });
+                return
+            }
+            if (bodyData.roleName) {
+                const { userId, roleName } = ctx.state.user;
+                const roleList = await sequelize.model('role').findAll()
+                let roleIndex = {}
+                roleList.forEach(item => {
+                    roleIndex[item.roleName] = item.index
+                })
+                if (roleIndex[bodyData.roleName] === undefined) {
+                    // 入参不对
+                    responseFormatter({
+                        ctx,
+                        code: '1003'
+                    });
+                    return
+                }
+                if (roleIndex[roleName] >= roleIndex[bodyData.roleName]) {
+                    // 修改人的角色小于被修改人的即将修改角色 则失败
+                    responseFormatter({
+                        ctx,
+                        code: '1005',
+                    })
+                    return
+                }
+                userModule.deleteLoginToken(modifiedPersonId) // 删除被修改用户的token
+                bodyData.roleId = roleList.find(item => { return item.roleName === bodyData.roleName }).id
+                delete bodyData.roleName
+            }
+            await sequelize.model('user').update(bodyData, { where: { id: modifiedPersonId } })
+            responseFormatter({
+                ctx,
+                code: '1000'
+            });
+        } else {
+            // 入参不对
+            responseFormatter({
+                ctx,
+                code: '1003'
+            });
+        }
+    }
+    // 获取角色列表
+    static async getRole(ctx) {
+        const data = await sequelize.model('role').findAll()
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data
         })
     }
 };

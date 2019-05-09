@@ -27,11 +27,27 @@ export default [{
     params: {},
     options: {}
 }, {
+    name: 'getRoleList',
+    method: 'GET',
+    desc: '获取用户角色列表',
+    path: '/user/role',
+    mockPath: '/user/role',
+    params: {},
+    options: {}
+}, {
     name: 'getUserManage',
     method: 'GET',
     desc: '获取用户管理信息',
     path: '/user/manage',
     mockPath: '/user/manage',
+    params: {},
+    options: {}
+}, {
+    name: 'updateUserManage',
+    method: 'PUT',
+    desc: '更新用户管理信息',
+    path: '/user/manage/:id',
+    mockPath: '/user/manage/:id',
     params: {},
     options: {}
 }, {
