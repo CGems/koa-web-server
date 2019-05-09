@@ -1,3 +1,3 @@
 <template>
-    <div>dashboard</div>
+    <div style="padding: 10px;">dashboard</div>
 </template>

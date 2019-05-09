@@ -46,36 +46,47 @@ export const constantRouterMap = [
                 meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
             }
         ]
+    },
+    {
+        path: '/accountKey',
+        component: 'layout/Layout',
+        children: [
+            {
+                path: 'index',
+                name: 'accountKey',
+                component: 'accountKey',
+                meta: { title: 'R网账户管理', icon: 'key', noCache: true }
+            }
+        ]
     }
 ]
 
 export const asyncRouterMap = [{
-    path: '/registerToken',
+    path: '/manage',
     component: 'layout/Layout',
+    meta: {
+        title: '后台管理',
+        icon: 'backend',
+        roles: ['admin', 'superAdmin'] // you can set roles in root nav
+    },
     children: [{
-        path: 'index',
+        path: 'registerToken',
         name: 'registerToken',
         component: 'registerToken',
         meta: {
             title: '注册码',
             icon: 'token',
-            roles: ['admin', 'superAdmin'],
             noCache: true
         }
-    }]
-
-}, {
-    path: '/userManage',
-    component: 'layout/Layout',
-    children: [{
-        path: 'index',
+    }, {
+        path: 'userManage',
         name: 'userManage',
         component: 'userManage',
         meta: {
             title: '用户管理',
             icon: 'user',
-            roles: ['admin', 'superAdmin'],
             noCache: true
         }
     }]
+
 }, { path: '*', redirect: '/404', hidden: true }]
