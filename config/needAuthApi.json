@@ -2,41 +2,57 @@
     "GET": [
         {
             "path": "/api/v1/user",
-            "roles": "all"
+            "roles": "all",
+            "desc": "获取用户信息"
         },
         {
             "path": "/api/v1/user/registerToken",
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "获取自己所有申请的注册码"
         },
         {
             "path": "/api/v1/user/manage",
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "账户权限对应的的用户列表"
         },
         {
             "path": "/api/v1/user/role",
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "获取用户角色列表"
+        },
+        {
+            "path": "/api/v1/robot/accountKey",
+            "roles": "all",
+            "desc": "获取R网账户key"
         }
     ],
     "POST": [
         {
             "path": "/api/v1/user/logout",
-            "roles": "all"
+            "roles": "all",
+            "desc": "登出"
         },
         {
             "path": "/api/v1/user/registerToken",
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "新增注册码"
+        },
+        {
+            "path": "/api/v1/robot/accountKey",
+            "roles": "all",
+            "desc": "新增R网账户Key"
         }
     ],
     "PUT": [
@@ -45,7 +61,8 @@
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "用户管理中修改用户信息"
         }
     ],
     "DELETE": [
@@ -54,7 +71,13 @@
             "roles": [
                 "admin",
                 "superAdmin"
-            ]
+            ],
+            "desc": "删除未使用或过期注册码"
+        },
+        {
+            "path": "/api/v1/robot/accountKey/:id",
+            "roles": "all",
+            "desc": "删除R网账户key"
         }
     ]
 }
