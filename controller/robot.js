@@ -47,7 +47,7 @@ module.exports = class {
                     code: '1000'
                 });
             } catch (error) {
-                if (error.response && (error.response.data.head.code === "2008"||error.response.data.head.code === "2005")) {
+                if (error.response && (error.response.data.head.code === "2008" || error.response.data.head.code === "2005")) {
                     responseFormatter({
                         ctx,
                         code: '1020'
@@ -72,11 +72,19 @@ module.exports = class {
         const { userId } = ctx.state.user;
         const paramData = ctx.params
         if (paramData && paramData.id) {
-            await sequelize.model('accountKey').destroy({ where: { id: paramData.id, userId } })
-            responseFormatter({
-                ctx,
-                code: '1000'
-            });
+            const affectedRows = await sequelize.model('accountKey').destroy({ where: { id: paramData.id, userId } })
+            if (affectedRows === 1) {
+                responseFormatter({
+                    ctx,
+                    code: '1000'
+                });
+            }
+            else {
+                responseFormatter({
+                    ctx,
+                    code: '1021'
+                });
+            }
         } else {
             // 入参不对
             responseFormatter({

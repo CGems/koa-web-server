@@ -87,15 +87,23 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(async () => {
-        await this.$api["robotDeleteAccountKey"]({},{url:`/robot/accountKey/${id}`})
-        this.getAccountKey();
-        this.$message({
-          type: "success",
-          message: "删除成功!"
+      })
+        .then(async () => {
+          await this.$api["robotDeleteAccountKey"](
+            {},
+            { url: `/robot/accountKey/${id}` }
+          );
+          this.getAccountKey();
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+          // window.globalObj.vbus.$emit("CHANGE_KEY_DATA");
+        })
+        .catch(error => {
+          this.$message({ type: "error", message: error.msg });
+          this.getAccountKey();
         });
-        // window.globalObj.vbus.$emit("CHANGE_KEY_DATA");
-      });
     },
     dialogClose() {
       this.$refs.form.resetFields();
