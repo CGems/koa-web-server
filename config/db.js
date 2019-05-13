@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const envConfig = require('./../config/index')
 const sequelize = new Sequelize(envConfig.database, envConfig.databaseUsername, envConfig.databasePassword, {
-    host: 'localhost',
+    host: envConfig.host,
     dialect: 'mysql',
     dialectOptions: {
         supportBigNumbers: true

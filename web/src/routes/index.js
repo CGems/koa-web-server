@@ -58,6 +58,18 @@ export const constantRouterMap = [
                 meta: { title: 'R网账户管理', icon: 'key', noCache: true }
             }
         ]
+    },
+    {
+        path: '/selfTradeConfig',
+        component: 'layout/Layout',
+        children: [
+            {
+                path: 'index',
+                name: 'selfTradeConfig',
+                component: 'selfTradeConfig',
+                meta: { title: '自成交配置', icon: 'selfTrade', noCache: true }
+            }
+        ]
     }
 ]
 
