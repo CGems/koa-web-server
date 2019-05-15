@@ -1,4 +1,3 @@
-const moment = require('moment');
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('token', {
         id: {

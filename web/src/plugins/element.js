@@ -36,7 +36,8 @@ import {
     Scrollbar,
     Dropdown,
     DropdownItem,
-    DropdownMenu
+    DropdownMenu,
+    Cascader
 } from 'element-ui'
 // 按需引入element-ui的部分功能
 Vue.use(Loading.directive);
@@ -79,5 +80,6 @@ Vue.use(Scrollbar)
 Vue.use(Dropdown)
 Vue.use(DropdownItem)
 Vue.use(DropdownMenu)
+Vue.use(Cascader)
 
 ElementLocale.i18n((key, value) => i18n.t(key, value))

@@ -98,7 +98,6 @@ export default {
             type: "success",
             message: "删除成功!"
           });
-          // window.globalObj.vbus.$emit("CHANGE_KEY_DATA");
         })
         .catch(error => {
           this.$message({ type: "error", message: error.msg });
@@ -127,7 +126,6 @@ export default {
             }
             await this.$api["robotAddAccountKey"](this.form);
             await this.getAccountKey();
-            //   window.globalObj.vbus.$emit("CHANGE_KEY_DATA");
             this.commitLoading = false;
             this.keyConfigDialogVisible = false;
           } catch (error) {

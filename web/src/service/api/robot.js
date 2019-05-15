@@ -22,4 +22,20 @@ export default [{
     mockPath: '/robot/accountKey/:id',
     params: {},
     options: {}
+}, {
+    name: 'getSelfTradeConfig',
+    method: 'GET',
+    desc: '获取自成交配置',
+    path: '/robot/selfTradeConfig',
+    mockPath: '/robot/selfTradeConfig',
+    params: {},
+    options: {}
+}, {
+    name: 'addSelfTradeConfig',
+    method: 'POST',
+    desc: '获取自成交配置',
+    path: '/robot/selfTradeConfig',
+    mockPath: '/robot/selfTradeConfig',
+    params: {},
+    options: {}
 }]

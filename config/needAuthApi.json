@@ -33,6 +33,11 @@
             "path": "/api/v1/robot/accountKey",
             "roles": "all",
             "desc": "获取R网账户key"
+        },
+        {
+            "path": "/api/v1/robot/selfTradeConfig",
+            "roles": "all",
+            "desc": "获取自成交配置"
         }
     ],
     "POST": [
@@ -53,6 +58,11 @@
             "path": "/api/v1/robot/accountKey",
             "roles": "all",
             "desc": "新增R网账户Key"
+        },
+        {
+            "path": "/api/v1/robot/selfTradeConfig",
+            "roles": "all",
+            "desc": "新增自成交配置"
         }
     ],
     "PUT": [

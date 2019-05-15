@@ -25,10 +25,6 @@ module.exports = class {
         const { userId } = ctx.state.user;
         const bodyData = ctx.request.body;
         if (bodyData && bodyData.title && bodyData.accessKey && bodyData.secretKey) {
-            responseFormatter({
-                ctx,
-                code: '1000'
-            })
             const apiInstance = new apiRfinex(
                 bodyData.accessKey,
                 bodyData.secretKey
@@ -72,7 +68,7 @@ module.exports = class {
         const { userId } = ctx.state.user;
         const paramData = ctx.params
         if (paramData && paramData.id) {
-            const affectedRows = await sequelize.model('accountKey').destroy({ where: { id: paramData.id, userId } })
+            const affectedRows = await robotModule.deleteAccountKey(paramData.id, userId)
             if (affectedRows === 1) {
                 responseFormatter({
                     ctx,
@@ -85,6 +81,42 @@ module.exports = class {
                     code: '1021'
                 });
             }
+        } else {
+            // 入参不对
+            responseFormatter({
+                ctx,
+                code: '1003'
+            });
+        }
+    }
+
+    // 获取自成交配置
+    static async getSelfTradeConfigByUserId(ctx){
+        const {userId} = ctx.state.user;
+        const data = await robotModule.getSelfTradeConfigByUserId(userId);
+        responseFormatter({
+            ctx,
+            code: '1000',
+            data
+        });
+    }
+    // 新增自成交配置
+    static async addSelfTradeConfig(ctx) {
+        const { userId } = ctx.state.user;
+        const bodyData = ctx.request.body;
+        if (bodyData && bodyData.account && bodyData.market && bodyData.minV && bodyData.maxV && bodyData.minI && bodyData.maxI) {
+            // TODO
+            if (+bodyData.minV >= +bodyData.maxV) {
+                responseFormatter({
+                    ctx,
+                    code: '1022'
+                });
+            }else if(+bodyData.minI >= +bodyData.maxI){
+                responseFormatter({
+                    ctx,
+                    code: '1024'
+                });
+            }        
         } else {
             // 入参不对
             responseFormatter({

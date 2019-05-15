@@ -16,4 +16,9 @@ router.post('/accountKey', koaBody(), robotController.addAccountKey)
 // 删除R网账户Key
 router.delete('/accountKey/:id', robotController.deleteAccountKey)
 
+// 获取自成交配置
+router.get('/selfTradeConfig', robotController.getSelfTradeConfigByUserId)
+// 新增自成交配置
+router.post('/selfTradeConfig', koaBody(), robotController.addSelfTradeConfig)
+
 module.exports = router;

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bignumber.js": "^8.1.1",
     "element-ui": "^2.4.5",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.11",

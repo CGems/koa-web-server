@@ -61,15 +61,14 @@
               icon="el-icon-delete"
               circle
               size="small"
-              @click="deleteConfig(scope.row._id)"
+              @click="deleteConfig(scope.row.id)"
             ></el-button>
             <el-button
-              v-if="!scope.row.accountIsDelete"
               :loading="scope.row.isSendRunCommand"
               style="width:73px;"
               size="mini"
               type="primary"
-              @click="runConfig(scope.row.type,scope.row._id)"
+              @click="runConfig(scope.row.type,scope.row.id)"
             >启动</el-button>
           </template>
           <template v-else-if="scope.row.status==='running'">
@@ -78,14 +77,14 @@
               style="width:73px;"
               size="mini"
               type="primary"
-              @click="stopConfig(scope.row.type,scope.row._id)"
+              @click="stopConfig(scope.row.type,scope.row.id)"
             >停止</el-button>
           </template>
         </template>
       </el-table-column>
     </el-table>
     <el-dialog
-      :title="selfForm._id?'自成交配置修改':'新增自成交配置'"
+      :title="selfForm.id?'自成交配置修改':'新增自成交配置'"
       :visible.sync="selfConfigDialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -103,12 +102,7 @@
       >
         <el-form-item label="账户" prop="account">
           <el-select v-model="selfForm.account" placeholder="请选择账户" style="width:100%">
-            <el-option
-              v-for="item in keyData"
-              :key="item._id"
-              :label="item.email"
-              :value="item._id"
-            >
+            <el-option v-for="item in keyData" :key="item.id" :label="item.email" :value="item.id">
               <span style="float: left">{{ item.email }}</span>
               <span style="float: right; color: #8492a6; font-size: 13px">
                 {{
@@ -156,6 +150,7 @@
   </div>
 </template>
 <script>
+import { BigNumber } from "bignumber.js";
 import { parseTime } from "Filters";
 import axios from "axios";
 export default {
@@ -181,6 +176,13 @@ export default {
           const currentMarketAmountFixed = this.markets[
             this.selfForm.market[0]
           ][this.selfForm.market[1]].ask.fixed;
+          const minVCanTrade = new BigNumber(0.1).pow(currentMarketAmountFixed).toFixed(currentMarketAmountFixed,1);
+          if (new BigNumber(minVCanTrade).isGreaterThan(value)) {
+            callback(
+              new Error(`最小成交量应大于或等于${minVCanTrade.toString()}`)
+            );
+            return;
+          }
           const decimal = parseFloat(value)
             .toString()
             .split(".")[1];
@@ -226,6 +228,8 @@ export default {
     const validatorSelfMinI = (rule, value, callback) => {
       if (value === undefined || value === "") {
         callback(new Error("请输入最小成交间隔!"));
+      } else if (value < 1) {
+        callback(new Error("最小间隔应大于1秒!"));
       } else {
         if (this.selfForm.maxI) {
           this.$refs.selfForm.validateField("maxI");
@@ -360,16 +364,12 @@ export default {
   },
   async created() {
     this.init();
-    // window.globalObj.vbus.$on("CHANGE_KEY_DATA", async () => {
-    //   await this.getAccount();
-    //   await this.getAllRobotsConfig();
-    // });
   },
   methods: {
     robotFromServer(event, data) {
       const { id, configType, res } = data;
       const index = this[`${[configType]}ConfigData`].findIndex(item => {
-        return item._id === id;
+        return item.id === id;
       });
       switch (res.type) {
         case "running":
@@ -418,85 +418,24 @@ export default {
     },
     async init() {
       await Promise.all([this.getAccount(), this.getMarkets()]);
-      //   this.getAllRobotsConfig();
+      this.getAllRobotsConfig();
     },
     openDialog() {
       this.selfConfigDialogVisible = true;
     },
-    // async getAllRobotsConfig(updateId) {
-    //   const obj = {
-    //     followConfigData: [],
-    //     selfConfigData: []
-    //   };
-    //   const data = await getAllRobotsConfig();
-    //   data.forEach(item => {
-    //     const account = this.keyData.find(key => {
-    //       return key._id === item.account;
-    //     });
-    //     item.accountEmail = account
-    //       ? account.email
-    //       : "账号已被删除，请更新或删除配置";
-    //     if (!account) {
-    //       // 账号已被删除
-    //       const config = this[`${item.type}ConfigData`].find(innerItem => {
-    //         return innerItem._id === item._id;
-    //       });
-    //       if (config && config.status === "running") {
-    //         // 如果该条配置的机器人正在运行且账户已被删除 停止该机器人
-    //         this.stopConfig(config.type, config._id);
-    //       }
-    //       item.accountIsDelete = true;
-    //       if (config && this.runHistory[config._id]) {
-    //         this.addHistory(
-    //           config._id,
-    //           "账号已被删除，请更新或删除配置",
-    //           new Date().getTime(),
-    //           "error"
-    //         );
-    //       }
-    //     }
-    //     obj[`${item.type}ConfigData`].push(item);
-    //   });
-    //   obj.followConfigData.forEach(item => {
-    //     const config = this.followConfigData.find(innerItem => {
-    //       return innerItem._id === item._id;
-    //     });
-    //     if (updateId !== item._id) {
-    //       if (item.accountIsDelete) {
-    //         // 优先判断账户是否已被删除
-    //         item.status = "error";
-    //         item.msg = "账号已被删除，请更新或删除配置";
-    //       } else if (config) {
-    //         item.status = config.status;
-    //         item.msg = config.msg;
-    //       }
-    //     }
-    //   });
-    //   obj.selfConfigData.forEach(item => {
-    //     const config = this.selfConfigData.find(innerItem => {
-    //       return innerItem._id === item._id;
-    //     });
-    //     if (updateId !== item._id) {
-    //       if (item.accountIsDelete) {
-    //         // 优先判断账户是否已被删除
-    //         item.status = "error";
-    //         item.msg = "账号已被删除，请更新或删除配置";
-    //       } else if (config) {
-    //         item.status = config.status;
-    //         item.msg = config.msg;
-    //       }
-    //     }
-    //   });
-    //   this.followConfigData = obj.followConfigData;
-    //   this.selfConfigData = obj.selfConfigData;
-    // },
+    async getAllRobotsConfig() {
+      const data = await this.$api["robotGetSelfTradeConfig"]();
+      this.selfConfigData = data;
+    },
     async getAccount() {
       this.keyData = await this.$api["robotGetAccountKey"]();
       return Promise.resolve();
     },
     async getMarkets() {
       try {
-        const {data} = await axios.get("https://api.58token.cn/api/v1/markets");
+        const { data } = await axios.get(
+          "https://api.58token.cn/api/v1/markets"
+        );
         const markets = {};
         const marketsOptions = [];
         data.forEach(item => {
@@ -547,8 +486,8 @@ export default {
     saveOrUpdateSelfForm() {
       this.$refs.selfForm.validate(async valid => {
         if (valid) {
-          if (this.selfForm._id) {
-            // await updateSingleRobotConfig(this.selfForm._id, {
+          if (this.selfForm.id) {
+            // await updateSingleRobotConfig(this.selfForm.id, {
             //   status: "",
             //   msg: "",
             //   type: "self",
@@ -565,73 +504,30 @@ export default {
               type: "success",
               message: "修改成功"
             });
-            // await this.getAllRobotsConfig(this.selfForm._id);
-            if (this.runHistory[this.selfForm._id]) {
-              this.$delete(this.runHistory, this.selfForm._id);
+            await this.getAllRobotsConfig();
+            if (this.runHistory[this.selfForm.id]) {
+              this.$delete(this.runHistory, this.selfForm.id);
             }
           } else {
-            // await saveRobotConfig({
-            //   type: "self",
-            //   status: "",
-            //   msg: "",
-            //   ...this.selfForm
-            // });
+            const obj = { ...this.selfForm };
+            obj.market = [...obj.market].reverse().join("_");
+            await this.$api["robotAddSelfTradeConfig"]({
+              status: "",
+              msg: "",
+              ...obj
+            });
             this.$message({
               type: "success",
               message: "添加成功"
             });
-            // await this.getAllRobotsConfig();
+            await this.getAllRobotsConfig();
           }
           this.closeSelfDialog();
         } else {
           return false;
         }
       });
-    },
-    // saveOrUpdateFollowForm() {
-    //   this.$refs.followForm.validate(async valid => {
-    //     if (valid) {
-    //       if (this.followForm._id) {
-    //         await updateSingleRobotConfig(this.followForm._id, {
-    //           status: "",
-    //           msg: "",
-    //           type: "follow",
-    //           account: this.followForm.account,
-    //           exchange: this.followForm.exchange,
-    //           market: this.followForm.market,
-    //           baseMarket: this.followForm.baseMarket,
-    //           minV: this.followForm.minV,
-    //           maxV: this.followForm.maxV,
-    //           depth: this.followForm.depth,
-    //           scale: this.followForm.scale
-    //         });
-    //         this.$message({
-    //           type: "success",
-    //           message: "修改成功"
-    //         });
-    //         await this.getAllRobotsConfig(this.followForm._id);
-    //         if (this.runHistory[this.followForm._id]) {
-    //           this.$delete(this.runHistory, this.followForm._id);
-    //         }
-    //       } else {
-    //         await saveRobotConfig({
-    //           type: "follow",
-    //           status: "",
-    //           msg: "",
-    //           ...this.followForm
-    //         });
-    //         this.$message({
-    //           type: "success",
-    //           message: "添加成功"
-    //         });
-    //         await this.getAllRobotsConfig();
-    //       }
-    //       this.closeFollowDialog();
-    //     } else {
-    //       return false;
-    //     }
-    //   });
-    // },
+    }
     // deleteConfig(id) {
     //   this.$confirm("是否永久删除该配置?", "提示", {
     //     confirmButtonText: "确定",
@@ -655,20 +551,20 @@ export default {
     // },
     // runConfig(type, id) {
     //   const index = this[`${type}ConfigData`].findIndex(item => {
-    //     return item._id === id;
+    //     return item.id === id;
     //   });
     //   this[`${type}ConfigData`].splice(index, 1, {
     //     ...this[`${type}ConfigData`][index],
     //     isSendRunCommand: true
     //   });
     //   const account = this.keyData.find(key => {
-    //     return key._id === this[`${type}ConfigData`][index].account;
+    //     return key.id === this[`${type}ConfigData`][index].account;
     //   });
     //   const currentMarket = this.markets[
     //     this[`${type}ConfigData`][index].market[0]
     //   ][this[`${type}ConfigData`][index].market[1]];
     //   const commandData = {
-    //     _id: id,
+    //     id: id,
     //     type,
     //     config: {
     //       ...this[`${type}ConfigData`][index],
@@ -684,7 +580,7 @@ export default {
     // },
     // stopConfig(type, id) {
     //   const index = this[`${type}ConfigData`].findIndex(item => {
-    //     return item._id === id;
+    //     return item.id === id;
     //   });
     //   this[`${type}ConfigData`].splice(index, 1, {
     //     ...this[`${type}ConfigData`][index],
@@ -693,7 +589,7 @@ export default {
     //   ipc2promise.send("robotFromWeb", {
     //     command: "stop",
     //     data: {
-    //       _id: id,
+    //       id: id,
     //       type
     //     }
     //   });
@@ -707,7 +603,6 @@ export default {
   position: relative;
   .page-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
   }
